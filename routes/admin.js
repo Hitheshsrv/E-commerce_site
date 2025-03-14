@@ -1,173 +1,138 @@
-const AdminBro = require("admin-bro");
-const AdminBroExpress = require("admin-bro-expressjs");
-const AdminBroMongoose = require("admin-bro-mongoose");
+const AdminJS = require('adminjs')
+const AdminJSExpress = require('@adminjs/express')
+const AdminJSMongoose = require('@adminjs/mongoose')
 const mongoose = require("mongoose");
 const Product = require("../models/product");
 const User = require("../models/user");
 const Order = require("../models/order");
 const Category = require("../models/category");
-AdminBro.registerAdapter(AdminBroMongoose);
+
+AdminJS.registerAdapter(AdminJSMongoose)
 
 const express = require("express");
 const app = express();
 
-const adminBro = new AdminBro({
+const adminJs = new AdminJS({
   databases: [mongoose],
   rootPath: "/admin",
   branding: {
     companyName: "BestBags",
     logo: "/images/shop-icon.png",
-    softwareBrothers: false,
+    favicon: "/images/shop-icon.png"
   },
   resources: [
     {
       resource: Product,
       options: {
-        parent: {
+        navigation: {
           name: "Admin Content",
-          icon: "InventoryManagement",
+          icon: "Inventory"
         },
         properties: {
           description: {
             type: "richtext",
-            isVisible: { list: false, filter: true, show: true, edit: true },
+            isVisible: { list: false, filter: true, show: true, edit: true }
           },
           _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false },
+            isVisible: { list: false, filter: true, show: true, edit: false }
           },
           title: {
-            isTitle: true,
+            isTitle: true
           },
           price: {
-            type: "number",
+            type: "number"
           },
           imagePath: {
-            isVisible: { list: false, filter: false, show: true, edit: true },
-            components: {
-              show: AdminBro.bundle(
-                "../components/admin-imgPath-component.jsx"
-              ),
-            },
-          },
-        },
-      },
+            isVisible: { list: false, filter: false, show: true, edit: true }
+          }
+        }
+      }
     },
     {
       resource: User,
       options: {
-        parent: {
+        navigation: {
           name: "User Content",
-          icon: "User",
+          icon: "User"
         },
         properties: {
           _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false },
+            isVisible: { list: false, filter: true, show: true, edit: false }
           },
           username: {
-            isTitle: true,
-          },
-        },
-      },
+            isTitle: true
+          }
+        }
+      }
     },
     {
       resource: Order,
       options: {
-        parent: {
+        navigation: {
           name: "User Content",
-          icon: "User",
+          icon: "User"
         },
         properties: {
           user: {
-            isTitle: true,
+            isTitle: true
           },
           _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false },
+            isVisible: { list: false, filter: true, show: true, edit: false }
           },
           paymentId: {
-            isVisible: { list: false, filter: true, show: true, edit: false },
+            isVisible: { list: false, filter: true, show: true, edit: false }
           },
           address: {
-            isVisible: { list: false, filter: true, show: true, edit: false },
+            isVisible: { list: false, filter: true, show: true, edit: false }
           },
           createdAt: {
-            isVisible: { list: true, filter: true, show: true, edit: false },
+            isVisible: { list: true, filter: true, show: true, edit: false }
           },
           cart: {
-            isVisible: { list: false, filter: false, show: true, edit: false },
-            components: {
-              show: AdminBro.bundle("../components/admin-order-component.jsx"),
-            },
-          },
-          "cart.items": {
-            isVisible: {
-              list: false,
-              filter: false,
-              show: false,
-              edit: false,
-            },
-          },
-          "cart.totalQty": {
-            isVisible: {
-              list: false,
-              filter: false,
-              show: false,
-              edit: false,
-            },
-          },
-          "cart.totalCost": {
-            isVisible: {
-              list: false,
-              filter: false,
-              show: false,
-              edit: false,
-            },
-          },
-        },
-      },
+            isVisible: { list: false, filter: false, show: true, edit: false }
+          }
+        }
+      }
     },
     {
       resource: Category,
       options: {
-        parent: {
+        navigation: {
           name: "Admin Content",
-          icon: "User",
+          icon: "Categories"
         },
         properties: {
           _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false },
+            isVisible: { list: false, filter: true, show: true, edit: false }
           },
           slug: {
-            isVisible: { list: false, filter: false, show: false, edit: false },
+            isVisible: { list: false, filter: false, show: false, edit: false }
           },
           title: {
-            isTitle: true,
-          },
-        },
-      },
-    },
+            isTitle: true
+          }
+        }
+      }
+    }
   ],
   locale: {
     translations: {
       labels: {
-        loginWelcome: "Admin Panel Login",
+        loginWelcome: "Admin Panel Login"
       },
       messages: {
-        loginWelcome:
-          "Please enter your credentials to log in and manage your website contents",
-      },
-    },
-  },
-  dashboard: {
-    component: AdminBro.bundle("../components/admin-dashboard-component.jsx"),
-  },
+        loginWelcome: "Please enter your credentials to log in and manage your website contents"
+      }
+    }
+  }
 });
 
 const ADMIN = {
   email: process.env.ADMIN_EMAIL,
-  password: process.env.ADMIN_PASSWORD,
+  password: process.env.ADMIN_PASSWORD
 };
 
-const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
+const router = AdminJSExpress.buildAuthenticatedRouter(adminJs, {
   authenticate: async (email, password) => {
     if (ADMIN.password === password && ADMIN.email === email) {
       return ADMIN;
@@ -175,7 +140,7 @@ const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
     return null;
   },
   cookieName: process.env.ADMIN_COOKIE_NAME,
-  cookiePassword: process.env.ADMIN_COOKIE_PASSWORD,
+  cookiePassword: process.env.ADMIN_COOKIE_PASSWORD
 });
 
 module.exports = router;

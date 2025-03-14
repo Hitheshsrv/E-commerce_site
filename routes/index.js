@@ -1,6 +1,7 @@
 const express = require("express");
 const csrf = require("csurf");
-const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
 const Product = require("../models/product");
 const Category = require("../models/category");
 const Cart = require("../models/cart");
@@ -8,8 +9,24 @@ const Order = require("../models/order");
 const middleware = require("../middleware");
 const router = express.Router();
 
+// Initialize Razorpay
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+// CSRF protection
 const csrfProtection = csrf();
 router.use(csrfProtection);
+
+// Error handling for CSRF
+router.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    req.flash('error', 'Invalid form submission');
+    return res.redirect('back');
+  }
+  next(err);
+});
 
 // GET: home page
 router.get("/", async (req, res) => {
@@ -17,9 +34,16 @@ router.get("/", async (req, res) => {
     const products = await Product.find({})
       .sort("-createdAt")
       .populate("category");
-    res.render("shop/home", { pageName: "Home", products });
+    const categories = await Category.find({}).sort({ title: 1 });
+    res.render("shop/home", { 
+      pageName: "Home", 
+      products, 
+      categories,
+      csrfToken: req.csrfToken()
+    });
   } catch (error) {
     console.log(error);
+    req.flash('error', 'Error loading products');
     res.redirect("/");
   }
 });
@@ -217,25 +241,54 @@ router.get("/checkout", middleware.isLoggedIn, async (req, res) => {
   });
 });
 
-// POST: handle checkout logic and payment using Stripe
+// POST: handle checkout logic and payment using Razorpay
 router.post("/checkout", middleware.isLoggedIn, async (req, res) => {
   if (!req.session.cart) {
     return res.redirect("/shopping-cart");
   }
   const cart = await Cart.findById(req.session.cart._id);
-  stripe.charges.create(
-    {
-      amount: cart.totalCost * 100,
-      currency: "usd",
-      source: req.body.stripeToken,
-      description: "Test charge",
-    },
-    function (err, charge) {
-      if (err) {
-        req.flash("error", err.message);
-        console.log(err);
-        return res.redirect("/checkout");
-      }
+
+  try {
+    // Create Razorpay order
+    const order = await razorpay.orders.create({
+      amount: cart.totalCost * 100, // Amount in paise
+      currency: "INR",
+      receipt: `order_${Date.now()}`,
+    });
+
+    // Send order details to client
+    res.json({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      order_id: order.id,
+      amount: order.amount,
+      currency: order.currency
+    });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Failed to create payment order");
+    res.status(500).json({ error: "Failed to create payment order" });
+  }
+});
+
+// POST: verify Razorpay payment
+router.post("/payment/verify", middleware.isLoggedIn, async (req, res) => {
+  const {
+    razorpay_payment_id,
+    razorpay_order_id,
+    razorpay_signature
+  } = req.body;
+
+  // Verify signature
+  const sign = razorpay_order_id + "|" + razorpay_payment_id;
+  const expectedSign = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(sign.toString())
+    .digest("hex");
+
+  if (razorpay_signature === expectedSign) {
+    try {
+      // Get cart and create order
+      const cart = await Cart.findById(req.session.cart._id);
       const order = new Order({
         user: req.user,
         cart: {
@@ -244,21 +297,22 @@ router.post("/checkout", middleware.isLoggedIn, async (req, res) => {
           items: cart.items,
         },
         address: req.body.address,
-        paymentId: charge.id,
+        paymentId: razorpay_payment_id,
       });
-      order.save(async (err, newOrder) => {
-        if (err) {
-          console.log(err);
-          return res.redirect("/checkout");
-        }
-        await cart.save();
-        await Cart.findByIdAndDelete(cart._id);
-        req.flash("success", "Successfully purchased");
-        req.session.cart = null;
-        res.redirect("/user/profile");
-      });
+
+      await order.save();
+      await cart.save();
+      await Cart.findByIdAndDelete(cart._id);
+      req.flash("success", "Successfully purchased");
+      req.session.cart = null;
+      res.json({ success: true });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Failed to process order" });
     }
-  );
+  } else {
+    res.status(400).json({ error: "Invalid payment signature" });
+  }
 });
 
 // create products array to store the info of each product in the cart
@@ -276,3 +330,31 @@ async function productsFromCart(cart) {
 }
 
 module.exports = router;
+// Helper function to validate payment signature
+function validatePaymentSignature(razorpay_signature, sign) {
+  const expectedSign = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(sign.toString())
+    .digest("hex");
+  return razorpay_signature === expectedSign;
+}
+
+// Helper function to process order
+async function processOrder(req, cart, razorpay_payment_id) {
+  const order = new Order({
+    user: req.user,
+    cart: {
+      totalQty: cart.totalQty,
+      totalCost: cart.totalCost, 
+      items: cart.items
+    },
+    address: req.body.address,
+    paymentId: razorpay_payment_id
+  });
+
+  await order.save();
+  await cart.save();
+  await Cart.findByIdAndDelete(cart._id);
+  req.flash("success", "Successfully purchased");
+  req.session.cart = null;
+}

@@ -25,7 +25,7 @@ The application is deployed to Heroku and can be accessed through the following 
 
 [BestBags on Heroku](https://best-bags.herokuapp.com/)
 
-The website resembles a real store and you can add products to your cart and pay for them. If you want to try the checkout process, you can use the dummy card number provided by stripe for testing which is 4242 4242 4242 4242 with any expiration date, CVC, and zip codes. Please <u><b>DO NOT</b></u> provide real card number and data.
+The website resembles a real store and you can add products to your cart and pay for them. The payment is processed using Razorpay. Please <u><b>DO NOT</b></u> provide real payment information during testing.
 
 In order to access the admin panel on "/admin" you need to provide the admin email and password.
 
@@ -37,7 +37,7 @@ To run this application, you have to set your own environmental variables. For s
 
 - SESSION_SECRET: a secret message for the session. You can use any string here.
 
-- STRIPE_PRIVATE_KEY: the stripe package is used to process payment in the checkout route. To get this, you should set up a stripe account and put your private API key here.
+- RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET: the Razorpay package is used to process payment in the checkout route. To get these, you should set up a Razorpay account and put your API keys here.
 
 - GMAIL_EMAIL, GMAIL_PASSWORD: the email and password given to nodemailer to send/receive the email. Please put a real email and password here because you will receive the messages sent from the contact us form on this email.
 
@@ -58,7 +58,7 @@ The application is built with:
 - Express version 4.16.1
 - Bootstrap version 4.4.1
 - FontAwesome version 5.13.0
-- Stripe API v3: used for payment in the checkout page
+- Razorpay API: used for payment in the checkout page
 - Mapbox API: used to show the map in the about us page
 - AdminBro: used and customized to implement the admin panel
 - Nodemailer: used to send emails from the contact us form
@@ -77,7 +77,7 @@ Users can do the following:
 - Delete products from the shopping cart
 - Display the shopping cart
 - To checkout, a user must be logged in
-- Checkout information is processed using stripe and the payment is send to the admin
+- Checkout information is processed using Razorpay and the payment is send to the admin
 - The profile contains all the orders a user has made
 
 Admins can do the following:
@@ -114,23 +114,15 @@ All the models can be found in the models directory created using mongoose.
 
 ### Cart Schema:
 
-- items: an array of objects, each object contains: <br>
-  ~ productId (ObjectId - a reference to the product schema) <br>
-  ~ qty (Number) <br>
-  ~ price (Number) <br>
-  ~ title (String) <br>
-  ~ productCode (Number) <br>
+- items (Array of items)
 - totalQty (Number)
 - totalCost (Number)
 - user (ObjectId - a reference to the user schema)
-- createdAt
-  <br><br>
-  \*\*The reason for including the title, price, and productCode again in the items object is AdminBro. If we are to write our own admin interface, we can remove them and instead populate a product field using the product id. However, AdminBro doesn't populate deep levels, so we had to repeat these fields in the items array in order to display them in the admin panel.
 
 ### Order Schema:
 
 - user (ObjectId - a reference to the user schema)
-- cart (instead of a reference, we had to structure an object identical to the cart schema because of AdminBro, so we can display the cart's contents in the admin interface under each order)
+- cart (Object containing items, totalQty, and totalCost)
 - address (String)
 - paymentId (String)
 - createdAt (Date)
@@ -138,21 +130,15 @@ All the models can be found in the models directory created using mongoose.
 
 ## Colors
 
-Below is the color palette used in this application:
+The application uses a specific color palette:
 
-- ![#478ba2](https://via.placeholder.com/15/478ba2/000000?text=+) `#478ba2`
-- ![#b9d4db](https://via.placeholder.com/15/b9d4db/000000?text=+) `#b9d4db`
-- ![#e9765b](https://via.placeholder.com/15/e9765b/000000?text=+) `#e9765b`
-- ![#f2a490](https://via.placeholder.com/15/f2a490/000000?text=+) `#f2a490`
-- ![#de5b6d](https://via.placeholder.com/15/de5b6d/000000?text=+) `#de5b6d`
-- ![#18a558](https://via.placeholder.com/15/18a558/000000?text=+) `#18a558`
-- ![#f9f7f4](https://via.placeholder.com/15/f9f7f4/000000?text=+) `#f9f7f4`
-- ![#202020](https://via.placeholder.com/15/202020/000000?text=+) `#202020`
-- ![#474747](https://via.placeholder.com/15/474747/000000?text=+) `#474747`
+- Dark Blue: #1a237e
+- Light Blue: #478ba2
+- Dark Orange: #e9765b
+- Green: #b6e3d4
+- Ivory: #f8f1e9
+- Black: #1a1a1a
 
 ## License
 
-[![License](https://img.shields.io/:License-MIT-blue.svg?style=flat-square)](http://badges.mit-license.org)
-
-- MIT License
-- Copyright 2020 © [Maryam Aljanabi](https://github.com/maryamaljanabi)
+This project is licensed under the MIT License - see the LICENSE file for details.

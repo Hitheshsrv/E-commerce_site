@@ -1,63 +1,70 @@
-// Create a Stripe client.
-const stripe = Stripe("pk_test_Nw7zXh6zu9SXKrzk7KDxKUiV004Ly59ywq");
-
-// Create an instance of Elements.
-const elements = stripe.elements();
-
-const style = {
-  base: {
-    color: "#32325d",
-    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-    fontSmoothing: "antialiased",
-    fontSize: "16px",
-  },
-  invalid: {
-    color: "#fa755a",
-    iconColor: "#fa755a",
-  },
-};
-
-// Create an instance of the card Element.
-const card = elements.create("card", { style: style });
-
-// Add an instance of the card Element into the `card-element` <div>.
-card.mount("#card-element");
-
-// Handle real-time validation errors from the card Element.
-card.addEventListener("change", function (event) {
-  const displayError = document.getElementById("card-errors");
-  if (event.error) {
-    displayError.textContent = event.error.message;
-  } else {
-    displayError.textContent = "";
-  }
-});
-
-// Handle form submission.
+// Handle form submission
 const $form = $("#checkout-form");
 
 $form.submit(function (event) {
   event.preventDefault();
   $form.find("button").prop("disabled", true);
 
-  const extraDetails = {
-    name: $("#card-name").val(),
+  // Get form data
+  const formData = {
+    name: $("#name").val(),
+    email: $("#email").val(),
+    phone: $("#phone").val(),
+    address: $("#address").val(),
+    _csrf: $('input[name="_csrf"]').val()
   };
 
-  stripe.createToken(card, extraDetails).then(function (result) {
-    if (result.error) {
-      $form.find("button").prop("disabled", false); // Re-enable submission
-    } else {
-      // Send the token to your server.
-      stripeTokenHandler(result.token);
+  // Send the form data to the server
+  $.ajax({
+    url: "/checkout",
+    type: "POST",
+    data: formData,
+    success: function (response) {
+      // Create Razorpay options
+      const options = {
+        key: response.key_id,
+        amount: response.amount,
+        currency: response.currency,
+        name: "Your Store Name",
+        description: "Purchase Description",
+        order_id: response.order_id,
+        handler: function (response) {
+          // Handle successful payment
+          $.ajax({
+            url: "/payment/verify",
+            type: "POST",
+            data: {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              _csrf: $('input[name="_csrf"]').val()
+            },
+            success: function (response) {
+              window.location.href = "/user/profile";
+            },
+            error: function (error) {
+              $("#error").removeClass("d-none").text("Payment verification failed. Please try again.");
+              $form.find("button").prop("disabled", false);
+            }
+          });
+        },
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+          contact: formData.phone
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
+
+      // Initialize Razorpay
+      const rzp = new Razorpay(options);
+      rzp.open();
+    },
+    error: function (error) {
+      $("#error").removeClass("d-none").text("Failed to initialize payment. Please try again.");
+      $form.find("button").prop("disabled", false);
     }
   });
 });
-
-// Submit the form with the token ID.
-function stripeTokenHandler(token) {
-  // Insert the token ID into the form so it gets submitted to the server
-  $form.append($('<input type="hidden" name="stripeToken" />').val(token.id));
-  // Submit the form
-  $form.get(0).submit();
-}

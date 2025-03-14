@@ -17,34 +17,41 @@ require("./config/passport");
 
 // mongodb configuration
 connectDB();
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-// admin route
-const adminRouter = require("./routes/admin");
-app.use("/admin", adminRouter);
-
+// Middleware setup
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// Session configuration
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     store: new MongoStore({
       mongooseConnection: mongoose.connection,
     }),
-    //session expires after 3 hours
-    cookie: { maxAge: 60 * 1000 * 60 * 3 },
+    cookie: { 
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      secure: false
+    }
   })
 );
+
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+
+// admin route
+const adminRouter = require("./routes/admin");
+app.use("/admin", adminRouter);
 
 // global variables across routes
 app.use(async (req, res, next) => {
