@@ -1,28 +1,28 @@
-<%- include ../partials/header %>
-<%- include ../partials/categories-navbar %>
+<%- include("../shop/partials/header") %>
+<%- include("../shop/partials/categories-navbar") %>
 
 <div class="container">
   <!-- Flash messages -->
-      <div class="row mt-3 mb-3">
-        <div class="col-md-8 m-auto">
-          <% if (successMsg) { %>
-          <div id="success" class="alert alert-success">
-            <%= successMsg %>
-          </div>
-          <% } else { %>
-          <div id="success" class="alert alert-success d-none"></div>
-          <% } %>
-        </div>
-        <div class="col-md-8 m-auto">
-          <% if (errorMsg) { %>
-          <div id="error" class="alert alert-danger">
-            <%= errorMsg %>
-          </div>
-          <% } else { %>
-          <div id="error" class="alert alert-danger d-none"></div>
-          <% } %>
-        </div>
+  <div class="row mt-3 mb-3">
+    <div class="col-md-8 m-auto">
+      <% if (successMsg) { %>
+      <div id="success" class="alert alert-success">
+        <%= successMsg %>
       </div>
+      <% } else { %>
+      <div id="success" class="alert alert-success d-none"></div>
+      <% } %>
+    </div>
+    <div class="col-md-8 m-auto">
+      <% if (errorMsg) { %>
+      <div id="error" class="alert alert-danger">
+        <%= errorMsg %>
+      </div>
+      <% } else { %>
+      <div id="error" class="alert alert-danger d-none"></div>
+      <% } %>
+    </div>
+  </div>
   <!-- User's orders -->
   <div class="row mt-4">
     <div class="col-md-8 m-auto">
@@ -48,10 +48,10 @@
       </div>
       <%}) %>
       <%} else { %>
-        <h3 class="text-center" >You have not made any orders yet</h3>
+      <h3 class="text-center">You have not made any orders yet</h3>
       <%} %>
     </div>
   </div>
 </div>
 
-<%- include ../partials/footer %>
+<%- include("../shop/partials/footer") %>

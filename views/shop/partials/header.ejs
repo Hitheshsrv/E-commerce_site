@@ -32,10 +32,14 @@
       crossorigin="anonymous"
     ></script>
 
-    <script
-      src="https://kit.fontawesome.com/91abd10b8f.js"
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
       crossorigin="anonymous"
-    ></script>
+      referrerpolicy="no-referrer"
+    />
 
     <link rel="stylesheet" href="/stylesheets/style.css" />
 
@@ -61,71 +65,71 @@
   <body>
     <div id="page-container">
       <div id="content-wrap">
-        <div class="row nav-container mx-auto">
-          <div class="col-md-4 col-sm-12 col-xs-12">
-            <div class="search-container">
-              <form class="form-inline" action="/products/search" method="GET">
-                <input
-                  class="search-input"
-                  type="search"
-                  placeholder="Search"
-                  name="search"
-                />
-              </form>
+        <!-- Navigation -->
+        <div class="nav-container">
+          <div class="row mx-auto">
+            <div class="col-md-4 col-sm-12 col-xs-12">
+              <div class="search-container">
+                <form class="form-inline" action="/products/search" method="GET">
+                  <input
+                    class="search-input"
+                    type="search"
+                    placeholder="Search"
+                    name="search"
+                  />
+                </form>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-12 col-xs-12 logo-container">
+              <a href="/">
+                <img class="logo-img img-fluid" src="/images/shop-icon.png" alt="logo" />
+                <h4 class="logo-title">BestBags</h4>
+              </a>
+            </div>
+
+            <div class="col-md-4 col-sm-12 col-xs-12 right-nav">
+              <ul>
+                <li>
+                  <a href="/shopping-cart">
+                    <i class="fas fa-shopping-cart"></i> <% if(session.cart) { %>
+                    <span class="badge badge-pill badge-info"
+                      ><%= session.cart.totalQty %></span
+                    >
+                    <% } else { %>
+                    <span class="badge badge-pill badge-info">0</span>
+                    <% } %>
+                  </a>
+                </li>
+                <% if (login) { %>
+                <li>
+                  <a
+                    class="dropdown-toggle"
+                    href="#"
+                    role="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    <i class="fas fa-user"></i> Welcome <%=currentUser.username%>
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/user/profile">User Account</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/user/logout">Logout</a>
+                  </div>
+                </li>
+                <% } else {%>
+                <li>
+                  <a href="/user/signup"> Sign Up</a>
+                </li>
+                <li>
+                  <a href="/user/signin"> Sign In</a>
+                </li>
+                <% }%>
+              </ul>
             </div>
           </div>
-
-          <div class="col-md-4 col-sm-12 col-xs-12 logo-container">
-            <a href="/">
-              <img class="logo-img img-fluid" src="/images/shop-icon.png" alt="logo" />
-              <h4 class="logo-title">BestBags</h4>
-            </a>
-          </div>
-
-          <div class="col-md-4 col-sm-12 col-xs-12 right-nav">
-            <ul>
-              <li>
-                <a href="/shopping-cart">
-                  <i class="fas fa-shopping-cart"></i> <% if(session.cart) { %>
-                  <span class="badge badge-pill badge-info"
-                    ><%= session.cart.totalQty %></span
-                  >
-                  <% } else { %>
-                  <span class="badge badge-pill badge-info">0</span>
-                  <% } %>
-                </a>
-              </li>
-              <% if (login) { %>
-              <li>
-                <a
-                  class="dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  <i class="fas fa-user"></i> Welcome <%=currentUser.username%>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="/user/profile">User Account</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="/user/logout">Logout</a>
-                </div>
-              </li>
-              <% } else {%>
-              <li>
-                <a href="/user/signup"> Sign Up</a>
-              </li>
-              <li>
-                <a href="/user/signin"> Sign In</a>
-              </li>
-              <% }%>
-            </ul>
-          </div>
         </div>
-      </div>
-    </div>
-  </body>
-</html>
-
+        <!-- Main Content -->
+        <main>

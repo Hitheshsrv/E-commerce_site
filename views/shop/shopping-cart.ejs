@@ -1,4 +1,4 @@
-<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+<%- include("partials/header") %> <%- include("partials/categories-navbar") %>
 <div class="container cart">
   <% if (cart != null && !cart.paid ) { %>
   <div class="row">
@@ -88,4 +88,4 @@
   <% } %>
 </div>
 
-<%- include ../partials/footer %>
+<%- include("partials/footer") %>

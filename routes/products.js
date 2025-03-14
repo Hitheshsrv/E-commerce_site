@@ -1,4 +1,8 @@
-const express = require("express");
+passport.deserializeUser((id, done) => {
+  User.findById(id, (err, user) => {
+    done(err, user);
+  });
+});const express = require("express");
 const router = express.Router();
 const Product = require("../models/product");
 const Category = require("../models/category");
@@ -17,7 +21,7 @@ router.get("/", async (req, res) => {
       .limit(perPage)
       .populate("category");
 
-    const count = await Product.count();
+    const count = await Product.countDocuments();
 
     res.render("shop/index", {
       pageName: "All Products",
@@ -51,7 +55,7 @@ router.get("/search", async (req, res) => {
       .limit(perPage)
       .populate("category")
       .exec();
-    const count = await Product.count({
+    const count = await Product.countDocuments({
       title: { $regex: req.query.search, $options: "i" },
     });
     res.render("shop/index", {
@@ -84,7 +88,7 @@ router.get("/:slug", async (req, res) => {
       .limit(perPage)
       .populate("category");
 
-    const count = await Product.count({ category: foundCategory.id });
+    const count = await Product.countDocuments({ category: foundCategory.id });
 
     res.render("shop/index", {
       pageName: foundCategory.title,
