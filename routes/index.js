@@ -31,14 +31,33 @@ router.use((err, req, res, next) => {
 // GET: home page
 router.get("/", async (req, res) => {
   try {
+    // First ensure we have default categories
+    const categories = await Category.find({}).sort({ title: 1 });
+    if (categories.length === 0) {
+      const defaultCategories = [
+        { title: "Men's Bags" },
+        { title: "Women's Bags" },
+        { title: "Travel Bags" }
+      ];
+      
+      for (const cat of defaultCategories) {
+        const category = new Category(cat);
+        await category.save();
+      }
+    }
+
+    // Now fetch products and updated categories
     const products = await Product.find({})
       .sort("-createdAt")
-      .populate("category");
-    const categories = await Category.find({}).sort({ title: 1 });
+      .populate("category")
+      .limit(9);  // Only fetch what we need for the carousel
+
+    const updatedCategories = await Category.find({}).sort({ title: 1 });
+
     res.render("shop/home", { 
       pageName: "Home", 
-      products, 
-      categories,
+      products: products || [], 
+      categories: updatedCategories,
       csrfToken: req.csrfToken()
     });
   } catch (error) {
@@ -120,6 +139,7 @@ router.get("/shopping-cart", async (req, res) => {
         cart: cart_user,
         pageName: "Shopping Cart",
         products: await productsFromCart(cart_user),
+        csrfToken: req.csrfToken()
       });
     }
     // if there is no cart in session and user is not logged in, cart is empty
@@ -128,6 +148,7 @@ router.get("/shopping-cart", async (req, res) => {
         cart: null,
         pageName: "Shopping Cart",
         products: null,
+        csrfToken: req.csrfToken()
       });
     }
     // otherwise, load the session's cart
@@ -135,6 +156,7 @@ router.get("/shopping-cart", async (req, res) => {
       cart: req.session.cart,
       pageName: "Shopping Cart",
       products: await productsFromCart(req.session.cart),
+      csrfToken: req.csrfToken()
     });
   } catch (err) {
     console.log(err.message);
@@ -275,8 +297,13 @@ router.post("/payment/verify", middleware.isLoggedIn, async (req, res) => {
   const {
     razorpay_payment_id,
     razorpay_order_id,
-    razorpay_signature
+    razorpay_signature,
+    address
   } = req.body;
+
+  if (!address) {
+    return res.status(400).json({ error: "Shipping address is required" });
+  }
 
   // Verify signature
   const sign = razorpay_order_id + "|" + razorpay_payment_id;
@@ -296,12 +323,11 @@ router.post("/payment/verify", middleware.isLoggedIn, async (req, res) => {
           totalCost: cart.totalCost,
           items: cart.items,
         },
-        address: req.body.address,
+        address: address, // Use the address from the request
         paymentId: razorpay_payment_id,
       });
 
       await order.save();
-      await cart.save();
       await Cart.findByIdAndDelete(cart._id);
       req.flash("success", "Successfully purchased");
       req.session.cart = null;

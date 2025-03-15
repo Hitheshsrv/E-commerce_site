@@ -126,6 +126,7 @@ router.get("/profile", middleware.isLoggedIn, async (req, res) => {
       errorMsg,
       successMsg,
       pageName: "User Profile",
+      csrfToken: req.csrfToken()
     });
   } catch (err) {
     console.log(err);

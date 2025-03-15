@@ -1,12 +1,16 @@
+const passport = require("passport");
+const express = require("express");
+const router = express.Router();
+const Product = require("../models/product");
+const Category = require("../models/category");
+const User = require("../models/user");
+var moment = require("moment");
+
 passport.deserializeUser((id, done) => {
   User.findById(id, (err, user) => {
     done(err, user);
   });
-});const express = require("express");
-const router = express.Router();
-const Product = require("../models/product");
-const Category = require("../models/category");
-var moment = require("moment");
+});
 
 // GET: display all products
 router.get("/", async (req, res) => {

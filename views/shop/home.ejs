@@ -32,9 +32,9 @@
 <!-- Store's categories section -->
 <div class="container mb-5">
   <h2 class="text-center mb-4">Store's Categories</h2>
-  <% if (categories) { %>
+  <% if (categories && categories.length > 0) { %>
   <div class="row justify-content-center align-items-center">
-    <% for(let i=0; i<3; i++){ %>
+    <% for(let i=0; i < Math.min(3, categories.length); i++){ %>
     <div class="col-lg-3 col-md-4 col-sm-6 mb-4 text-center">
       <a class="title-link category-card" href="/products/<%=categories[i].slug%>">
         <div class="category-img-wrapper mb-3">
@@ -78,25 +78,21 @@
       <!-- First slide -->
       <div class="carousel-item active">
         <div class="row">
-          <% for(let i=0; i<3; i++) { %>
+          <% for(let i=0; i<3 && i<products.length; i++) { %>
           <div class="col-md-4 col-sm-6 mb-4">
             <div class="single-product">
-              <a class="product-img" href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>">
+              <a class="product-img" href="/products/<%= products[i].category ? products[i].category.slug : 'uncategorized' %>/<%= products[i]._id %>">
                 <img src="<%= products[i].imagePath %>" alt="<%= products[i].title %>" class="img-fluid" />
               </a>
               <div class="product-info p-3">
-                <a class="title-link" href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>">
+                <a class="title-link" href="/products/<%= products[i].category ? products[i].category.slug : 'uncategorized' %>/<%= products[i]._id %>">
                   <h5 class="product-title mb-2"><%= products[i].title %></h5>
                 </a>
-                <div class="price mb-3">$<%= products[i].price %></div>
+                <div class="price mb-3">₹<%= products[i].price %></div>
                 <% if(products[i].available) { %>
-                <a href="/add-to-cart/<%=products[i]._id%>" class="btn btn-primary btn-block">
-                  Add to Cart
-                </a>
+                <a href="/add-to-cart/<%= products[i]._id %>" class="btn btn-primary btn-block">Add to Cart</a>
                 <% } else { %>
-                <button class="btn btn-danger btn-block" disabled>
-                  Sold Out
-                </button>
+                <button class="btn btn-danger btn-block" disabled>Sold Out</button>
                 <% } %>
               </div>
             </div>
@@ -108,25 +104,21 @@
       <!-- Second slide -->
       <div class="carousel-item">
         <div class="row">
-          <% for(let i=3; i<6; i++) { %>
+          <% for(let i=3; i<6 && i<products.length; i++) { %>
           <div class="col-md-4 col-sm-6 mb-4">
             <div class="single-product">
-              <a class="product-img" href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>">
+              <a class="product-img" href="/products/<%= products[i].category ? products[i].category.slug : 'uncategorized' %>/<%= products[i]._id %>">
                 <img src="<%= products[i].imagePath %>" alt="<%= products[i].title %>" class="img-fluid" />
               </a>
               <div class="product-info p-3">
-                <a class="title-link" href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>">
+                <a class="title-link" href="/products/<%= products[i].category ? products[i].category.slug : 'uncategorized' %>/<%= products[i]._id %>">
                   <h5 class="product-title mb-2"><%= products[i].title %></h5>
                 </a>
-                <div class="price mb-3">$<%= products[i].price %></div>
+                <div class="price mb-3">₹<%= products[i].price %></div>
                 <% if(products[i].available) { %>
-                <a href="/add-to-cart/<%=products[i]._id%>" class="btn btn-primary btn-block">
-                  Add to Cart
-                </a>
+                <a href="/add-to-cart/<%= products[i]._id %>" class="btn btn-primary btn-block">Add to Cart</a>
                 <% } else { %>
-                <button class="btn btn-danger btn-block" disabled>
-                  Sold Out
-                </button>
+                <button class="btn btn-danger btn-block" disabled>Sold Out</button>
                 <% } %>
               </div>
             </div>
@@ -138,25 +130,21 @@
       <!-- Third slide -->
       <div class="carousel-item">
         <div class="row">
-          <% for(let i=6; i<9; i++) { %>
+          <% for(let i=6; i<9 && i<products.length; i++) { %>
           <div class="col-md-4 col-sm-6 mb-4">
             <div class="single-product">
-              <a class="product-img" href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>">
+              <a class="product-img" href="/products/<%= products[i].category ? products[i].category.slug : 'uncategorized' %>/<%= products[i]._id %>">
                 <img src="<%= products[i].imagePath %>" alt="<%= products[i].title %>" class="img-fluid" />
               </a>
               <div class="product-info p-3">
-                <a class="title-link" href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>">
+                <a class="title-link" href="/products/<%= products[i].category ? products[i].category.slug : 'uncategorized' %>/<%= products[i]._id %>">
                   <h5 class="product-title mb-2"><%= products[i].title %></h5>
                 </a>
-                <div class="price mb-3">$<%= products[i].price %></div>
+                <div class="price mb-3">₹<%= products[i].price %></div>
                 <% if(products[i].available) { %>
-                <a href="/add-to-cart/<%=products[i]._id%>" class="btn btn-primary btn-block">
-                  Add to Cart
-                </a>
+                <a href="/add-to-cart/<%= products[i]._id %>" class="btn btn-primary btn-block">Add to Cart</a>
                 <% } else { %>
-                <button class="btn btn-danger btn-block" disabled>
-                  Sold Out
-                </button>
+                <button class="btn btn-danger btn-block" disabled>Sold Out</button>
                 <% } %>
               </div>
             </div>

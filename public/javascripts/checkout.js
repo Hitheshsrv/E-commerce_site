@@ -1,5 +1,6 @@
 // Handle form submission
 const $form = $("#checkout-form");
+let userAddress = ''; // Store address for later use
 
 $form.submit(function (event) {
   event.preventDefault();
@@ -13,6 +14,9 @@ $form.submit(function (event) {
     address: $("#address").val(),
     _csrf: $('input[name="_csrf"]').val()
   };
+
+  // Store address for payment verification
+  userAddress = formData.address;
 
   // Send the form data to the server
   $.ajax({
@@ -37,10 +41,16 @@ $form.submit(function (event) {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
+              address: userAddress, // Include the address in verification
               _csrf: $('input[name="_csrf"]').val()
             },
             success: function (response) {
-              window.location.href = "/user/profile";
+              if (response.success) {
+                window.location.href = "/user/profile";
+              } else {
+                $("#error").removeClass("d-none").text("Payment processing failed. Please try again.");
+                $form.find("button").prop("disabled", false);
+              }
             },
             error: function (error) {
               $("#error").removeClass("d-none").text("Payment verification failed. Please try again.");
