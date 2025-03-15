@@ -139,6 +139,4 @@ The application uses a specific color palette:
 - Ivory: #f8f1e9
 - Black: #1a1a1a
 
-## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
