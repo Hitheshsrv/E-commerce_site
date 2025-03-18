@@ -14,24 +14,24 @@
     <ul class="navbar-nav mx-auto">
       <li <% if (pageName === "All Products") { %>
         class="nav-item active"
-        <%} else {%>
+        <% } else { %>
           class="nav-item"
-        <%} %> 
+        <% } %> 
       >
         <a class="nav-link" href="/products/">All</a>
       </li>
 
       <% if (categories) { %>
-        <% categories.forEach( category => { %>
+        <% categories.forEach(function(category) { %>
           <li <% if (pageName === category.title) { %>
             class="nav-item active"
             <% } else { %>
               class="nav-item"
             <% } %> 
           >
-          <a class="nav-link" href="/products/<%= category.slug %>"><%= category.title %></a>
-        </li>
-          <% }) %>
+            <a class="nav-link" href="/products/<%= category.slug %>"><%= category.title %></a>
+          </li>
+        <% }); %>
       <% } %>
     </ul>
   </div>
