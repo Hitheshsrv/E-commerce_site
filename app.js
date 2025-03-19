@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const flash = require("connect-flash");
+const csrf = require('csurf');
 const Category = require("./models/category");
 var MongoStore = require("connect-mongo")(session);
 const connectDB = require("./config/db");
@@ -48,6 +49,13 @@ app.use(
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+
+// CSRF protection
+app.use(csrf());
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 
 // admin route
 const adminRouter = require("./routes/admin");

@@ -39,7 +39,7 @@ async function seedDB() {
         productCode: generateProductCode(),
         title: "iFlight Nazgul5 V3 HD",
         description: "Professional 5-inch freestyle drone with DJI O3 digital FPV system. Perfect for aerial cinematography and freestyle flying.",
-        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/iflight-nazgul5-v3-5-6s-w-dji-o3-hd-camera-system_1_700x.jpg",
+        imagePath: "https://i.imgur.com/RTABFSI.jpeg",
         price: 499.99,
         category: findCategoryByTitle("Drones"),
         available: true,
