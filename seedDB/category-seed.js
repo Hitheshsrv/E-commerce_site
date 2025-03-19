@@ -6,28 +6,45 @@ const connectDB = require("./../config/db");
 connectDB();
 
 async function seedDB() {
-  async function seedCateg(titleStr) {
-    try {
-      const categ = await new Category({ title: titleStr });
-      await categ.save();
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  }
+  try {
+    // First, delete all existing categories
+    console.log("Deleting existing categories...");
+    await Category.deleteMany({});
+    console.log("All existing categories deleted!");
 
-  async function closeDB() {
-    console.log("CLOSING CONNECTION");
+    async function seedCateg(titleStr) {
+      try {
+        const categ = await new Category({ title: titleStr });
+        await categ.save();
+        console.log(`Added category: ${titleStr}`);
+      } catch (error) {
+        console.log(error);
+        return error;
+      }
+    }
+
+    async function closeDB() {
+      console.log("CLOSING CONNECTION");
+      await mongoose.disconnect();
+    }
+
+    // Seed new drone-related categories
+    console.log("Adding new categories...");
+    await seedCateg("Drones");
+    await seedCateg("Frames");
+    await seedCateg("VTXs & Goggles");
+    await seedCateg("Electronics");
+    await seedCateg("Motors & Propellers");
+    await seedCateg("Batteries");
+    await seedCateg("Radios & Receivers");
+    await seedCateg("More");
+    
+    console.log("All categories added successfully!");
+    await closeDB();
+  } catch (error) {
+    console.log("Error seeding categories:", error);
     await mongoose.disconnect();
   }
-  await seedCateg("Backpacks");
-  await seedCateg("Briefcases");
-  await seedCateg("Mini Bags");
-  await seedCateg("Large Handbags");
-  await seedCateg("Travel");
-  await seedCateg("Totes");
-  await seedCateg("Purses");
-  await closeDB();
 }
 
 seedDB();

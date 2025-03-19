@@ -3,328 +3,265 @@ require("dotenv").config({ path: path.join(__dirname, "../.env") });
 const Product = require("../models/product");
 const Category = require("../models/category");
 const mongoose = require("mongoose");
-const faker = require("faker");
 const connectDB = require("./../config/db");
 
+// Function to generate a random product code
+function generateProductCode() {
+  return Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + 
+         Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 async function seedDB() {
-  faker.seed(0);
-  
   try {
-    // First, create categories if they don't exist
-    const categories = await Category.find({});
-    let mensBags, womensBags, travelBags, briefcases, largeHandbags, purses, totes;
-    
-    if (categories.length === 0) {
-      mensBags = await new Category({ title: "Men's Bags" }).save();
-      womensBags = await new Category({ title: "Women's Bags" }).save();
-      travelBags = await new Category({ title: "Travel Bags" }).save();
-      briefcases = await new Category({ title: "Briefcases" }).save();
-      largeHandbags = await new Category({ title: "Large Handbags" }).save();
-      purses = await new Category({ title: "Purses" }).save();
-      totes = await new Category({ title: "Totes" }).save();
-    } else {
-      [mensBags, womensBags, travelBags, briefcases, largeHandbags, purses, totes] = categories;
-    }
-
-    // Clear existing products
+    // First, delete all existing products
+    console.log("Deleting existing products...");
     await Product.deleteMany({});
+    console.log("All existing products deleted!");
 
-    //----------------------Backpacks
-    const backpacks_titles = [
-      "Classic Blue Backpack",
-      "Black Fjallraven Backpack",
-      "Brown and Green Leather Backpack",
-      "Grey Stylish Backpack",
-      "Elegant Black Backpack",
-      "Practical Blue Backpack With Leather Straps",
-      "Soft Classic Biege Backpack",
-      "Practical Durable Backpack",
-      "Comfortable Laptop Backpack",
-      "Extra Large Grey Backpack",
-    ];
-    const backpacks_imgs = [
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80",
-      "https://images.unsplash.com/photo-1562546106-b9cb3a76a206?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-      "https://images.unsplash.com/photo-1546938576-6e6a64f317cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1400&q=80",
-      "https://images.unsplash.com/photo-1585916420730-d7f95e942d43?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://images.pexels.com/photos/2905238/pexels-photo-2905238.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
-      "https://images.pexels.com/photos/2422476/pexels-photo-2422476.png?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
-      "https://images.pexels.com/photos/1545998/pexels-photo-1545998.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260",
-      "https://live.staticflickr.com/3428/3361015646_303a2d0571_b.jpg",
-      "https://storage.needpix.com/rsynced_images/backpack-2634622_1280.jpg",
-    ];
+    // Get categories after they've been updated
+    console.log("Fetching updated categories...");
+    const categories = await Category.find({});
+    if (categories.length === 0) {
+      throw new Error("No categories found! Run category-seed.js first.");
+    }
+    console.log(`Found ${categories.length} categories`);
+    
+    // Function to find category by title
+    const findCategoryByTitle = (title) => {
+      return categories.find(cat => cat.title === title);
+    };
 
-    //--------------------Travel Bags
-    const travel_titles = [
-      "Stylish Pastel Pink Travel Bag",
-      "A Fahionable Set of Two Pink Travel Bags",
-      "White and Black Hard Luggage",
-      "Rainbow Dotted Duffle Bag Luggage",
-      "Blue and Gray Classic Suitcase",
-      "A Set of Three Hard Durable Suitcases",
-      "Light Blue Hard Luggage",
-      "Black Leather Vintage Suitcase",
-      "A Set of Three Large Travel Bags",
-      "Two Stylish Light Green Travel Bags With Different Sizes",
-      "Simple Blue Luggage with Many Compartments",
-    ];
-
-    const travel_imgs = [
-      "https://p1.pxfuel.com/preview/899/786/420/travel-bag-hard-and-bag.jpg",
-      "https://p1.pxfuel.com/preview/479/120/981/luggage-metallic-luguagge-case.jpg",
-      "https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://cdn.pixabay.com/photo/2019/06/20/16/10/duffle-bag-4287485_960_720.png",
-      "https://p0.pikrepo.com/preview/74/133/blue-and-gray-suede-rolling-luggage-thumbnail.jpg",
-      "https://cdn.pixabay.com/photo/2019/01/22/15/53/suitcases-3948389_960_720.png",
-      "https://cdn.pixabay.com/photo/2019/07/09/11/52/travel-bag-4326738_960_720.jpg",
-      "https://p0.pxfuel.com/preview/942/496/984/various-bag-bags-luggage.jpg",
-      "https://p0.pxfuel.com/preview/273/580/962/travelvarious-bag-bags-holiday.jpg",
-      "https://p1.pxfuel.com/preview/926/897/247/travel-bag-hard-and-bag.jpg",
-      "https://p0.pxfuel.com/preview/963/699/697/bag-blue-handbag-white.jpg",
-    ];
-
-    //--------------------Briefcases
-    const briefcases_titles = [
-      "Aluminium Metal Suitcase",
-      "Black Leather Durable Suitcase",
-    ];
-
-    const briefcases_imgs = [
-      "https://upload.wikimedia.org/wikipedia/commons/6/6d/Aluminium_Briefcase.jpg",
-      "http://res.freestockphotos.biz/pictures/1/1751-black-leather-briefcase-on-a-white-background-pv.jpg",
-    ];
-
-    //--------------------Mini Bags
-    const miniBags_titles = [
-      "Pink Leather Crossbody Bag",
-      "Stylish Pink Crossbody Bag",
-      "Mini Black Carra Shoulder Bag",
-      "White Leather Mini Bag with Crossbody Strap",
-      "Blue Jeans Mini Bag",
-      "Biege Be Dior Mini Bag with Crossbody Strap",
-      "Red Be Dior Mini Bag with Crossbody Strap",
-      "Light Blue Mini Bag with Golden Strap",
-      "Light Green Mini Bag with Golden Strap",
-      "Pastel Pink Mini Bag with Golden Strap",
-      "Biege Leather Crossbody Bag",
-      "White Leather Crossbody Bag",
-      "Elegant White Mini Bag with Silver Strap",
-      "Simple Red Mini Bag",
-    ];
-    const miniBags_imgs = [
-      "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1502&q=80",
-      "https://upload.wikimedia.org/wikipedia/commons/b/bc/DKNY_Mini_Flap_Crossbody_W_-_SS_Crossbody_R1513004_Kalbsleder_beige_%281%29_%2816080518124%29.jpg",
-      "https://p1.pxfuel.com/preview/177/215/691/handbag-bag-today-the-postwoman-fashion-style-skin.jpg",
-      "https://p2.piqsels.com/preview/392/1016/905/handbags-white-fashion-bag-shoulder-bag.jpg",
-      "https://c.pxhere.com/photos/37/cb/camera_bag_scene_package_fashion-900156.jpg!d",
-      "https://c.pxhere.com/photos/94/0e/bag_dior_x_n-867928.jpg!d",
-      "https://c.pxhere.com/photos/92/ad/bag_dior_u-867943.jpg!d",
-      "https://c.pxhere.com/photos/5b/ea/bag_fashion_style-518819.jpg!d",
-      "https://c.pxhere.com/photos/19/aa/bag_fashion_style-518820.jpg!d",
-      "https://c.pxhere.com/photos/41/9e/bag_fashion_style-518821.jpg!d",
-      "https://c.pxhere.com/photos/24/f9/bag_fashion_style-518803.jpg!d",
-      "https://c.pxhere.com/photos/16/e8/bag_fashion_style-518804.jpg!d",
-      "https://images.unsplash.com/photo-1564422167509-4f8763ff046e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://c.pxhere.com/photos/87/f0/bag_crimson_product_photos_padlock_bag_women_bags_dot_white-1000331.jpg!d",
-    ];
-
-    //--------------------Large Handags
-
-    const largeHandbags_titles = [
-      "Elegant Shiny Brown Leather Handbag",
-      "Black Leather Handbag with Golden Chains",
-      "Elegant Black Leather Handbag",
-      "Stylish Blue Handbag with its Purse",
-      "A set of Two Elegant Handbags",
-      "Practical Blue Leather Handbag with its Purse",
-      "Simple Black Leather Handbag",
-      "Golden Leather Handbag",
-      "Shiny Black Leather Handbag",
-      "Gray and Yellow Flowery Shoulder Bag",
-      "Blue and Brown Leather Handbag with Shoulder Strap",
-    ];
-    const largeHandbags_imgs = [
-      "https://c.pxhere.com/photos/a8/b7/handbag_purse_fashion_bag_female_style_women_elegance-703150.jpg!d",
-      "https://c.pxhere.com/photos/b6/5c/handbag_purse_fashion_bag_female_women_accessory_modern-703145.jpg!d",
-      "https://c.pxhere.com/photos/4b/82/handbag_purse_fashion_bag_female_style_women_lady-703156.jpg!d",
-      "https://images.unsplash.com/photo-1564422170194-896b89110ef8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://images.unsplash.com/photo-1564222256577-45e728f2c611?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80",
-      "https://p1.pxfuel.com/preview/680/478/429/online-shopping-lisaswardrobe-handbags-shopping.jpg",
-      "https://p1.pxfuel.com/preview/762/878/334/handbag-black-gold.jpg",
-      "https://p1.pxfuel.com/preview/550/178/484/bag-handbag-haberdashery.jpg",
-      "https://p1.pxfuel.com/preview/5/396/904/package-briefcase-leather-bags.jpg",
-      "https://p1.pxfuel.com/preview/843/210/542/vera-bradley-purse-handbag-shoulder-bag.jpg",
-      "https://p1.pxfuel.com/preview/57/634/392/purse-bag-handbag-fashion.jpg",
-    ];
-
-    //-----------------------Purses
-    const purses_titles = [
-      "Hot Pink Leather Purse",
-      "Glittery Black Purse with Golden Strap",
-      "Practical Black Leather Purse",
-      "Red Leather Pouche with Free Earrings",
-      "Lavender Leather Purse",
-      "White and Black Snakeskin Purse",
-      "Dark Brown Simple Purse",
-      "Red Kipling Pouche",
-      "Biege Kipling Pouche",
-    ];
-    const purses_imgs = [
-      "https://c.pxhere.com/photos/c2/fc/bag_fashion_style-518806.jpg!d",
-      "https://images.unsplash.com/photo-1564222195116-8a74a96b2c8c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://c.pxhere.com/photos/cb/9e/wallet_black_clutch_purse_leather_fashion_style_accessory-952715.jpg!d",
-      "https://c.pxhere.com/photos/63/90/purse_handbag_fashion_bag_style_design_leather_accessory-780266.jpg!d",
-      "https://c.pxhere.com/photos/2d/da/wallet_purple_wallet_purple_money_purse_billfold_lavender_fashion-863005.jpg!d",
-      "https://images.unsplash.com/photo-1563904092230-7ec217b65fe2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1534&q=80",
-      "https://www.publicdomainpictures.net/pictures/60000/velka/leather-purse-isolated-background.jpg",
-      "https://c.pxhere.com/photos/94/29/bag_handbag_purse_pink_red_fashion_glamour_accessory-952105.jpg!d",
-      "https://c.pxhere.com/photos/9b/57/bag_purse_handbag_fashion_style_accessory_white-1336949.jpg!d",
-    ];
-
-    //-----------------Totes
-
-    const totes_titles = [
-      "Plain White Cotton Tote",
-      "Elegant Red Leather Tote",
-      "Handmade Embroided White Tote with Red Roses",
-      "Multicolored White Tote",
-      "Owl White Cotton Tote",
-      "Simple Grey Zipped Tote",
-      "Earth Positive Tote Bag",
-      "Deep Purple Handstamped Tote",
-      "White Cotton Tote with Drawings",
-      "Grey Wolf Tote",
-      "Yellow and Green Bold Tote",
-    ];
-    const totes_imgs = [
-      "https://p1.pxfuel.com/preview/1021/986/529/bag-cotton-cotton-bag-textile-wall-white.jpg",
-      "https://p1.pxfuel.com/preview/741/996/910/handbag-fashion-fashionable-woman.jpg",
-      "https://p1.pxfuel.com/preview/58/205/88/shop-bag-bags-sale.jpg",
-      "https://p1.pxfuel.com/preview/367/279/652/bag-bag-elephant-cloth-bag.jpg",
-      "https://p0.pikrepo.com/preview/627/393/white-blue-and-red-owl-print-tote-bag.jpg",
-      "https://farm5.staticflickr.com/4022/4714518639_8d9e06be13_b.jpg",
-      "https://live.staticflickr.com/3538/3674472019_727d8c4669.jpg",
-      "https://live.staticflickr.com/5161/5342130557_7fa8cc5935_b.jpg",
-      "https://p1.pxfuel.com/preview/368/540/34/bag-cotton-natural-cotton-bag-advertising-royalty-free-thumbnail.jpg",
-      "https://p1.pxfuel.com/preview/726/975/813/bag-handbag-womans-bag-sport-bag.jpg",
-      "https://p1.pxfuel.com/preview/844/198/547/bag-burlap-advertising.jpg",
-    ];
-
-    // Create backpack products
-    for (let i = 0; i < backpacks_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: backpacks_titles[i],
-        imagePath: backpacks_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 50, max: 200 }),
-        category: mensBags._id,
+    // Products data
+    console.log("Adding new products...");
+    const products = [
+      // Drones Category
+      {
+        productCode: generateProductCode(),
+        title: "iFlight Nazgul5 V3 HD",
+        description: "Professional 5-inch freestyle drone with DJI O3 digital FPV system. Perfect for aerial cinematography and freestyle flying.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/iflight-nazgul5-v3-5-6s-w-dji-o3-hd-camera-system_1_700x.jpg",
+        price: 499.99,
+        category: findCategoryByTitle("Drones"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
-
-    // Create travel bag products
-    for (let i = 0; i < travel_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: travel_titles[i],
-        imagePath: travel_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 100, max: 300 }),
-        category: travelBags._id,
+      },
+      {
+        productCode: generateProductCode(),
+        title: "BETAFPV Beta75X HD Whoop",
+        description: "Ultralight 3S HD Digital VTX drone with 75mm wheelbase, perfect for indoor flying.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/betafpv-beta75x-2-3s-brushless-whoop-micro-drone-frsky_1_700x.jpg",
+        price: 249.99,
+        category: findCategoryByTitle("Drones"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
-
-    // Create women's bag products
-    for (let i = 0; i < miniBags_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: miniBags_titles[i],
-        imagePath: miniBags_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 30, max: 150 }),
-        category: womensBags._id,
+      },
+      {
+        productCode: generateProductCode(),
+        title: "Flywoo Firefly Baby Quad",
+        description: "Compact 80mm micro quadcopter with HD camera system.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/flywoo-firefly-1-6inch-4s-micro-quad-analog_1_700x.jpg",
+        price: 199.99,
+        category: findCategoryByTitle("Drones"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
-
-    // Create briefcase products
-    for (let i = 0; i < briefcases_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: briefcases_titles[i],
-        imagePath: briefcases_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 50, max: 200 }),
-        category: mensBags._id,
+      },
+      {
+        productCode: generateProductCode(),
+        title: "TBS Source One V5",
+        description: "Open source 5-inch freestyle frame with optimal weight distribution.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/tbs-source-one-v3-5in-frame-kit_1_700x.jpg",
+        price: 49.99,
+        category: findCategoryByTitle("Frames"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
-
-    // Create large handbag products
-    for (let i = 0; i < largeHandbags_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: largeHandbags_titles[i],
-        imagePath: largeHandbags_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 100, max: 300 }),
-        category: womensBags._id,
+      },
+      {
+        productCode: generateProductCode(),
+        title: "ImpulseRC Apex Frame",
+        description: "Premium 5-inch frame designed for HD digital FPV systems.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/impulserc-apex-5-freestyle-frame_1_700x.jpg",
+        price: 89.99,
+        category: findCategoryByTitle("Frames"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
-
-    // Create purse products
-    for (let i = 0; i < purses_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: purses_titles[i],
-        imagePath: purses_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 30, max: 150 }),
-        category: womensBags._id,
+      },
+      {
+        productCode: generateProductCode(),
+        title: "Armattan Marmotte Frame",
+        description: "Durable 5-inch freestyle frame with lifetime warranty.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/armattan-marmotte-5-fpv-frame_1_700x.jpg",
+        price: 94.99,
+        category: findCategoryByTitle("Frames"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
-
-    // Create tote products
-    for (let i = 0; i < totes_titles.length; i++) {
-      const product = new Product({
-        productCode: faker.helpers.replaceSymbolWithNumber("####-##########"),
-        title: totes_titles[i],
-        imagePath: totes_imgs[i],
-        description: faker.lorem.paragraph(),
-        price: faker.random.number({ min: 20, max: 100 }),
-        category: womensBags._id,
+      },
+      {
+        productCode: generateProductCode(),
+        title: "DJI Goggles 2",
+        description: "High-performance digital FPV goggles with ultra-low latency HD transmission.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/files/DJI_Goggles_2_700x.jpg",
+        price: 649.99,
+        category: findCategoryByTitle("VTXs & Goggles"),
         available: true,
         createdAt: Date.now()
-      });
-      await product.save();
-    }
+      },
+      {
+        productCode: generateProductCode(),
+        title: "Skyzone SKY04X Pro",
+        description: "OLED display analog goggles with 1920x1080 resolution and SteadyView receiver.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/skyzone-sky04x-pro-oled-diversity-fpv-goggles_1_700x.jpg",
+        price: 499.99,
+        category: findCategoryByTitle("VTXs & Goggles"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "TBS Unify Pro32 DP",
+        description: "High-quality video transmitter with MMCX connector and smart audio.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/tbs-unify-pro32-nano-5g8-video-transmitter_1_700x.jpg",
+        price: 39.99,
+        category: findCategoryByTitle("VTXs & Goggles"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "SucceX-E F7 FC",
+        description: "Advanced F7 flight controller with OSD and Blackbox logging.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/iflight-succex-e-f7-twing-flight-controller_1_700x.jpg",
+        price: 59.99,
+        category: findCategoryByTitle("Electronics"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "SucceX 45A 4-in-1 ESC",
+        description: "BLHeli_32 4-in-1 ESC for optimal motor control.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/iflight-succex-e-45a-4-in-1-esc_1_700x.jpg",
+        price: 79.99,
+        category: findCategoryByTitle("Electronics"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "DJI O3 Air Unit",
+        description: "Digital HD FPV transmission system with ultra-low latency.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/files/DJI_O3_Air_Unit_700x.jpg",
+        price: 229.99,
+        category: findCategoryByTitle("Electronics"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "XING-E 2207 Motor",
+        description: "High-performance 2750KV brushless motor for freestyle.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/iflight-xing-e-2207-fpv-motor_1_700x.jpg",
+        price: 24.99,
+        category: findCategoryByTitle("Motors & Propellers"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "HQProp ETHiX S3",
+        description: "Durable and efficient 5-inch tri-blade props.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/ethix-s3-watermelon-props_1_700x.jpg",
+        price: 3.99,
+        category: findCategoryByTitle("Motors & Propellers"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "T-Motor F40 Pro",
+        description: "Premium 2400KV motor for racing and freestyle.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/t-motor-f40-pro-motor_1_700x.jpg",
+        price: 21.99,
+        category: findCategoryByTitle("Motors & Propellers"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "Tattu R-Line 6S 1300mAh",
+        description: "High-discharge LiPo battery for maximum performance.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/tattu-r-line-version-3-0-1300mah-6s-120c-lipo-battery_1_700x.jpg",
+        price: 44.99,
+        category: findCategoryByTitle("Batteries"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "CNHL Black Series 4S",
+        description: "Reliable 1500mAh LiPo with 100C discharge rate.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/cnhl-black-series-1500mah-4s-100c-lipo-battery_1_700x.jpg",
+        price: 29.99,
+        category: findCategoryByTitle("Batteries"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "GNB 6S 1100mAh",
+        description: "Lightweight racing LiPo with high voltage stability.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/gnb-6s-1100mah-130c-lipo-battery_1_700x.jpg",
+        price: 32.99,
+        category: findCategoryByTitle("Batteries"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "RadioMaster TX16S MKII",
+        description: "Multi-protocol radio with Hall sensor gimbals and color display.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/radiomaster-tx16s-mark-ii-radio-controller_1_700x.jpg",
+        price: 199.99,
+        category: findCategoryByTitle("Radios & Receivers"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "TBS Crossfire Nano",
+        description: "Long-range RC receiver with reliable connection.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/tbs-crossfire-nano-rx_1_700x.jpg",
+        price: 29.99,
+        category: findCategoryByTitle("Radios & Receivers"),
+        available: true,
+        createdAt: Date.now()
+      },
+      {
+        productCode: generateProductCode(),
+        title: "ExpressLRS EP2 RX",
+        description: "High-performance 2.4GHz RC receiver system.",
+        imagePath: "https://cdn.shopify.com/s/files/1/0027/2708/4144/products/betafpv-elrs-ep2-rx_1_700x.jpg",
+        price: 19.99,
+        category: findCategoryByTitle("Radios & Receivers"),
+        available: true,
+        createdAt: Date.now()
+      }
+    ];
 
-    console.log("Database seeded!");
-    process.exit();
+    // Insert all products
+    await Product.insertMany(products);
+    console.log(`Successfully added ${products.length} products!`);
+    
+    await mongoose.disconnect();
+    console.log("Database connection closed.");
+    
   } catch (error) {
-    console.log(error);
-    process.exit(1);
+    console.log("Error seeding products:", error);
+    await mongoose.disconnect();
   }
 }
 
 // Connect to database and run seeder
+console.log("Connecting to database...");
 connectDB().then(() => {
   seedDB();
 });

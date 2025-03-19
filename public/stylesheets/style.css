@@ -158,6 +158,56 @@ body {
   background-color: darken(var(--accent-color), 10%);
 }
 
+/* Carousel styles */
+#topCarousel {
+  max-height: 500px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+#topCarousel .carousel-inner {
+  max-height: 500px;
+}
+
+#topCarousel .carousel-item img {
+  width: 100%;
+  height: 500px;
+  object-fit: contain;
+  object-position: center;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+/* Auth Buttons Styling */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.auth-buttons .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.auth-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.auth-buttons .btn i {
+  font-size: 1rem;
+}
+
+.nav-icon span {
+  margin-left: 0.3rem;
+  font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .navbar {
