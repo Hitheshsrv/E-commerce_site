@@ -2,32 +2,40 @@
   <div class="container-fluid">
     <ul class="nav-menu">
       <li class="nav-item">
-        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link category-filter" data-category="all">All Products</a>
       </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">Drones</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">Frames</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">VTXs & Goggles</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">Electronics</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">Motors & Propellers</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">Batteries</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">Radios & Receivers</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a href="#new-arrivals" class="nav-link">More</a>
-      </li>
+      <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+        <% categories.forEach(function(category) { %>
+          <li class="nav-item">
+            <a href="#new-arrivals" class="nav-link category-filter" data-category="<%= category.slug %>">
+              <%= category.title %>
+            </a>
+          </li>
+        <% }); %>
+      <% } else { %>
+        <!-- Make sure these category slugs match your product categories in the database -->
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="batteries">Batteries</a>
+        </li>
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="drones">Drones</a>
+        </li>
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="electronics">Electronics</a>
+        </li>
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="frames">Frames</a>
+        </li>
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="motors-propellers">Motors & Propellers</a>
+        </li>
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="vtxs-goggles">VTXs & Goggles</a>
+        </li>
+        <li class="nav-item">
+          <a href="#new-arrivals" class="nav-link category-filter" data-category="radios-receivers">Radios & Receivers</a>
+        </li>
+      <% } %>
     </ul>
   </div>
 </nav>

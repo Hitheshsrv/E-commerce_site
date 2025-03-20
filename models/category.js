@@ -14,6 +14,12 @@ const categorySchema = Schema({
     unique: true,
     slug: "title",
   },
+  imagePath: {
+    type: String,
+    default: function() {
+      return this.slug + '.jpg';
+    }
+  }
 });
 
 module.exports = mongoose.model("Category", categorySchema);

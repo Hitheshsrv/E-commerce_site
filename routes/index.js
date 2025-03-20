@@ -31,6 +31,9 @@ router.use((err, req, res, next) => {
 // GET: home page
 router.get("/", async (req, res) => {
   try {
+    const perPage = 8;
+    let page = parseInt(req.query.page) || 1;
+    
     // First ensure we have default categories
     const categories = await Category.find({}).sort({ title: 1 });
     if (categories.length === 0) {
@@ -46,19 +49,29 @@ router.get("/", async (req, res) => {
       }
     }
 
-    // Now fetch products and updated categories
+    // Now fetch products and updated categories with pagination
     const products = await Product.find({})
       .sort("-createdAt")
-      .populate("category")
-      .limit(9);  // Only fetch what we need for the carousel
-
+      .skip(perPage * page - perPage)
+      .limit(perPage)
+      .populate("category");
+    
+    const count = await Product.countDocuments();
+    const pages = Math.ceil(count / perPage);
+    
     const updatedCategories = await Category.find({}).sort({ title: 1 });
+    
+    
 
-    res.render("shop/home", { 
+    res.render("shop/index", { 
       pageName: "Home", 
       products: products || [], 
       categories: updatedCategories,
-      csrfToken: req.csrfToken()
+      successMsg: req.flash("success"),
+      errorMsg: req.flash("error"),
+      current: page,
+      pages: pages,
+      home: "/?"
     });
   } catch (error) {
     console.log(error);

@@ -78,6 +78,48 @@ router.get("/search", async (req, res) => {
   }
 });
 
+// GET: AJAX route for filtered products - with a clear 'api' prefix
+router.get("/api/filter/:category", async (req, res) => {
+  try {
+    console.log('Filter request received for category:', req.params.category);
+    
+    let query = {};
+    if (req.params.category !== 'all') {
+      const foundCategory = await Category.findOne({ slug: req.params.category });
+      console.log('Found category:', foundCategory);
+      
+      if (foundCategory) {
+        query.category = foundCategory.id;
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: `Category ${req.params.category} not found`
+        });
+      }
+    }
+
+    console.log('Query to execute:', query);
+    const products = await Product.find(query)
+      .sort("-createdAt")
+      .populate("category");
+    
+    console.log(`Found ${products.length} products`);
+
+    res.json({
+      success: true,
+      products: products,
+      category: req.params.category
+    });
+  } catch (error) {
+    console.error('Error in filter route:', error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching products",
+      error: error.message
+    });
+  }
+});
+
 //GET: get a certain category by its slug (this is used for the categories navbar)
 router.get("/:slug", async (req, res) => {
   const successMsg = req.flash("success")[0];

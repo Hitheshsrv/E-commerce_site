@@ -33,30 +33,34 @@ router.post(
     userSignUpValidationRules(),
     validateSignup,
     passport.authenticate("local.signup", {
-      successRedirect: "/user/profile",
       failureRedirect: "/user/signup",
       failureFlash: true,
     }),
   ],
   async (req, res) => {
     try {
-      //if there is cart session, save it to the user's cart in db
+      // Set success message first
+      req.flash("success", "Welcome! You have successfully signed up.");
+      
+      // Handle cart data
       if (req.session.cart) {
         const cart = await new Cart(req.session.cart);
         cart.user = req.user._id;
         await cart.save();
       }
-      // redirect to the previous URL
+      
+      // Handle redirect
       if (req.session.oldUrl) {
-        var oldUrl = req.session.oldUrl;
+        const oldUrl = req.session.oldUrl;
         req.session.oldUrl = null;
-        res.redirect(oldUrl);
-      } else {
-        res.redirect("/user/profile");
+        return res.redirect(oldUrl);
       }
+      
+      // Default redirect to products page
+      return res.redirect("/products");
     } catch (err) {
-      console.log(err);
-      req.flash("error", err.message);
+      console.error("Signup error:", err);
+      req.flash("error", "An error occurred during signup. Please try again.");
       return res.redirect("/");
     }
   }
@@ -98,13 +102,17 @@ router.post(
       if (cart) {
         req.session.cart = cart;
       }
-      // redirect to old URL before signing in
+      
+      // Set success message
+      req.flash("success", "Welcome back! You have successfully signed in.");
+      
+      // redirect to old URL before signing in or products page
       if (req.session.oldUrl) {
         var oldUrl = req.session.oldUrl;
         req.session.oldUrl = null;
         res.redirect(oldUrl);
       } else {
-        res.redirect("/user/profile");
+        res.redirect("/products");
       }
     } catch (err) {
       console.log(err);

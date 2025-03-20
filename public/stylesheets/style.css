@@ -96,8 +96,14 @@ body {
   transition: color 0.2s;
 }
 
-.nav-menu .nav-link:hover {
+.nav-menu .nav-link:hover,
+.nav-menu .nav-link.active {
   color: var(--accent-color);
+}
+
+.nav-menu .nav-link.active {
+  font-weight: bold;
+  border-bottom: 2px solid var(--accent-color);
 }
 
 /* Product Grid */
@@ -165,6 +171,9 @@ body {
   position: relative;
   overflow: hidden;
   margin-bottom: 4rem;
+  display: block !important; /* Force display */
+  visibility: visible !important; /* Ensure visibility */
+  z-index: 10; /* Ensure proper stacking */
 }
 
 .hero-section::before {
@@ -926,4 +935,37 @@ footer {
   border-top: 1px solid rgba(255,255,255,0.1);
   font-size: 0.9rem;
   color: var(--accent-color);
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+
+.user-menu .nav-icon {
+  color: #333;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.user-menu .nav-icon:hover {
+  color: #007bff;
+}
+
+.user-menu .nav-icon i {
+  margin-right: 5px;
+  font-size: 1.1em;
+}
+
+.user-menu .nav-icon span {
+  font-size: 0.9em;
+}
+
+/* Add a subtle separator between profile and logout */
+.user-menu .nav-icon:first-child {
+  border-right: 1px solid #ddd;
+  padding-right: 15px;
+  margin-right: 15px;
 }
