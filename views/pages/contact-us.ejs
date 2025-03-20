@@ -1,4 +1,4 @@
-<%- include ../partials/header %><%- include("../shop/partials/header") %><%- include("../shop/partials/header") %> 
+<%- include("../shop/partials/header") %> 
 <%- include("../shop/partials/categories-navbar") %>
 
 <div class="container">
@@ -6,20 +6,20 @@
     <div class="col-lg-8 col-md-12 m-auto">
       <h1 class="mt-4 mb-4 text-center">Contact Us</h1>
       <!-- Flash message -->
-      <% if (successMsg != null && successMsg) { %>
+      <% if (successMsg) { %>
         <div id="success" class="alert alert-success">
           <%= successMsg %>
         </div>
-        <% } %>
+      <% } %>
     </div>
     <div class="col-lg-8 col-md-12 text-justify m-auto">
       <!-- Introduction -->
-    <div class="mt-4 mb-4">
-      <p>You are always welcome to contact us at anytime! Feel free to email us or phone us using our contact details below<br />
-        You can also visit us or call us at anytime during our working hours from <i>Sunday to Thursday: 9AM to 12PM.</i> <br />
-        We reply to our emails even during the weekends. So please do not hesitate to contact us.
-      </p>
-    </div>
+      <div class="mt-4 mb-4">
+        <p>You are always welcome to contact us at anytime! Feel free to email us or phone us using our contact details below<br />
+          You can also visit us or call us at anytime during our working hours from <i>Sunday to Thursday: 9AM to 12PM.</i> <br />
+          We reply to our emails even during the weekends. So please do not hesitate to contact us.
+        </p>
+      </div>
       <!-- Email contacts -->
       <div class="mt-4 mb-4">
         <p>
@@ -57,21 +57,21 @@
           <a href="tel:555-555-5555">
             <i class="fa fa-phone" aria-hidden="true"></i>
             555-555-5555
-           </a>
+          </a>
         </p>
         <p>
           Call center phone 2:
           <a href="tel:555-555-5555">
             <i class="fa fa-phone" aria-hidden="true"></i>
             555-555-5555
-           </a>
+          </a>
         </p>
         <p>
           Whatsapp phone:
           <a href="tel:555-555-5555">
             <i class="fa fa-phone" aria-hidden="true"></i>
             555-555-5555
-           </a>
+          </a>
         </p>
       </div>
     </div>
@@ -81,19 +81,17 @@
       <div class="mt-5 mb-4">
         <h2>Contact Us Form</h2>
         <!-- Error flash message -->
-        <% if(errorMsg!=null && errorMsg.length>0) {%>
+        <% if (errorMsg && errorMsg.length > 0) { %>
           <div id="flash-msg" class="alert alert-danger">
-            <% errorMsg.forEach((message) => { %>
-            <p>
-              <%=message %>
-            </p>
-            <%}) %>
+            <% errorMsg.forEach(function(message) { %>
+              <p><%= message %></p>
+            <% }); %>
           </div>
-          <%}%>
+        <% } %>
         <form action="/pages/contact-us" method="POST">
           <div class="form-group">
             <label for="name">Name</label>
-            <input type="name" class="form-control" name="name" id="name" required />
+            <input type="text" class="form-control" name="name" id="name" required />
           </div>
           <div class="form-group">
             <label for="email">Email address</label>

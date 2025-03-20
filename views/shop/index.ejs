@@ -191,9 +191,15 @@
                 </div>
               </div>
               <% if (product.available) { %>
-                <button class="add-to-cart" onclick="window.location.href='/add-to-cart/<%=product._id%>'">
-                  <i class="fas fa-shopping-cart"></i> Add to Cart
-                </button>
+                <% if (login) { %>
+                  <button class="add-to-cart" onclick="window.location.href='/add-to-cart/<%=product._id%>'">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                  </button>
+                <% } else { %>
+                  <button class="add-to-cart" onclick="window.location.href='/user/signin'">
+                    <i class="fas fa-sign-in-alt"></i> Login to Add to Cart
+                  </button>
+                <% } %>
               <% } else { %>
                 <button class="add-to-cart sold-out" disabled>
                   <i class="fas fa-times"></i> Sold Out
@@ -226,6 +232,7 @@
       
       // Function to create product card HTML
       function createProductCard(product) {
+        const isLoggedIn = '<%= login %>' === 'true'; // Get login state from server
         return `
           <div class="product-card" data-category="${product.category.slug}">
             <div class="product-badges">
@@ -254,9 +261,13 @@
                 </div>
               </div>
               ${product.available 
-                ? `<button class="add-to-cart" onclick="window.location.href='/add-to-cart/${product._id}'">
-                     <i class="fas fa-shopping-cart"></i> Add to Cart
-                   </button>`
+                ? isLoggedIn
+                  ? `<button class="add-to-cart" onclick="window.location.href='/add-to-cart/${product._id}'">
+                       <i class="fas fa-shopping-cart"></i> Add to Cart
+                     </button>`
+                  : `<button class="add-to-cart" onclick="window.location.href='/user/signin'">
+                       <i class="fas fa-sign-in-alt"></i> Login to Add to Cart
+                     </button>`
                 : `<button class="add-to-cart sold-out" disabled>
                      <i class="fas fa-times"></i> Sold Out
                    </button>`

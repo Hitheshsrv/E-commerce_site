@@ -38,9 +38,9 @@ router.get("/", async (req, res) => {
     const categories = await Category.find({}).sort({ title: 1 });
     if (categories.length === 0) {
       const defaultCategories = [
-        { title: "Men's Bags" },
-        { title: "Women's Bags" },
-        { title: "Travel Bags" }
+        { title: "Electronics" },
+        { title: "Clothing" },
+        { title: "Home & Living" }
       ];
       
       for (const cat of defaultCategories) {

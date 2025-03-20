@@ -11,8 +11,13 @@ router.use(csrfProtection);
 
 //GET: display abous us page
 router.get("/about-us", (req, res) => {
+  const successMsg = req.flash("success")[0];
+  const errorMsg = req.flash("error")[0];
   res.render("pages/about-us", {
     pageName: "About Us",
+    csrfToken: req.csrfToken(),
+    successMsg,
+    errorMsg
   });
 });
 
