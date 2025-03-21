@@ -124,8 +124,9 @@ app.use(function (err, req, res, next) {
 
 var port = process.env.PORT || 3000;
 app.set("port", port);
-app.listen(port, () => {
-  console.log("Server running at port " + port);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running at http://13.233.103.234:${port}`);
+
 });
 
 module.exports = app;
