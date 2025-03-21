@@ -4,5 +4,12 @@ services:
     build: .
     ports:
       - "3000:3000"
-    env_file:
-      - .env
+    environment:
+      - MONGO_URI=mongodb+srv://kpuneeth664:54321@cluster0.nynih.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
