@@ -1,366 +1,368 @@
 <%- include('./partials/header') %>
 
 <!-- Main Content Area -->
-<div class="container-fluid p-0">
-  <div class="main-content">
-    <div class="row g-0">
-      <!-- Left Sidebar Categories -->
-      <div class="col-md-3">
-        <div class="categories-sidebar">
-          <div class="search-container">
-            <input type="text" id="productSearch" class="form-control search-input" placeholder="Search products...">
-            <button class="btn btn-primary search-btn">
-              <i class="fas fa-search"></i>
-            </button>
+<main class="main-wrapper">
+  <div class="container-fluid p-0">
+    <div class="main-content">
+      <div class="row g-0">
+        <!-- Left Sidebar Categories -->
+        <div class="col-md-3">
+          <div class="categories-sidebar">
+            <div class="search-container">
+              <input type="text" id="productSearch" class="form-control search-input" placeholder="Search products...">
+              <button class="btn btn-primary search-btn">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+            
+            <ul class="category-list">
+              <li class="category-item">
+                <a href="/products" class="category-link active">
+                  <i class="fas fa-box-open"></i>
+                  All Products
+                </a>
+              </li>
+              <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(function(category) { %>
+                  <li class="category-item">
+                    <a href="/products/<%= category.slug %>" class="category-link">
+                      <i class="fas fa-angle-right"></i>
+                      <%= category.title %>
+                    </a>
+                  </li>
+                <% }); %>
+              <% } %>
+            </ul>
           </div>
-          
-          <ul class="category-list">
-            <li class="category-item">
-              <a href="/products" class="category-link active">
-                <i class="fas fa-box-open"></i>
-                All Products
-              </a>
-            </li>
-            <% if (categories && categories.length > 0) { %>
-              <% categories.forEach(function(category) { %>
-                <li class="category-item">
-                  <a href="/products/<%= category.slug %>" class="category-link">
-                    <i class="fas fa-angle-right"></i>
-                    <%= category.title %>
-                  </a>
-                </li>
-              <% }); %>
-            <% } %>
-          </ul>
         </div>
-      </div>
 
-      <!-- Main Product Area -->
-      <div class="col-md-9">
-        <div id="productGridSection" class="product-section">
-          <div class="product-grid">
-            <% if (products && products.length > 0) { %>
-              <% products.forEach(function(product) { %>
-                <div class="product-card">
-                  <div class="product-badges">
-                    <% if (product.isNew) { %>
-                      <span class="badge badge-new">New</span>
-                    <% } %>
-                    <% if (product.discount) { %>
-                      <span class="badge badge-discount"><%= product.discount %>% OFF</span>
-                    <% } %>
-                  </div>
-                  <a href="/products/<%= product.category.slug %>/<%= product._id %>" class="product-link">
-                    <div class="product-image-wrapper">
-                      <img src="<%= product.imagePath %>" alt="<%= product.title %>" class="product-image"
-                           onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
+        <!-- Main Product Area -->
+        <div class="col-md-9">
+          <div id="productGridSection" class="product-section">
+            <div class="product-grid">
+              <% if (products && products.length > 0) { %>
+                <% products.forEach(function(product) { %>
+                  <div class="product-card">
+                    <div class="product-badges">
+                      <% if (product.isNew) { %>
+                        <span class="badge badge-new">New</span>
+                      <% } %>
+                      <% if (product.discount) { %>
+                        <span class="badge badge-discount"><%= product.discount %>% OFF</span>
+                      <% } %>
                     </div>
-                  </a>
-                  <div class="product-info">
-                    <h3 class="product-title"><%= product.title %></h3>
-                    <div class="product-meta">
-                      <div class="product-price">
-                        <% if (product.originalPrice) { %>
-                          <span class="original-price">₹<%= product.originalPrice %></span>
-                        <% } %>
-                        <span class="<%= product.discount ? 'discounted-price' : 'current-price' %>">
-                          ₹<%= product.price %>
-                        </span>
+                    <a href="/products/<%= product.category.slug %>/<%= product._id %>" class="product-link">
+                      <div class="product-image-wrapper">
+                        <img src="<%= product.imagePath %>" alt="<%= product.title %>" class="product-image"
+                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
                       </div>
+                    </a>
+                    <div class="product-info">
+                      <h3 class="product-title"><%= product.title %></h3>
+                      <div class="product-meta">
+                        <div class="product-price">
+                          <% if (product.originalPrice) { %>
+                            <span class="original-price">₹<%= product.originalPrice %></span>
+                          <% } %>
+                          <span class="<%= product.discount ? 'discounted-price' : 'current-price' %>">
+                            ₹<%= product.price %>
+                          </span>
+                        </div>
+                      </div>
+                      <% if (login) { %>
+                        <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">
+                          <i class="fas fa-shopping-cart"></i>
+                          Add to Cart
+                        </button>
+                      <% } else { %>
+                        <a href="/user/signin" class="add-to-cart login-required">
+                          <i class="fas fa-sign-in-alt"></i>
+                          Login to Add to Cart
+                        </a>
+                      <% } %>
                     </div>
-                    <% if (login) { %>
-                      <button class="add-to-cart" onclick="addToCart('<%= product._id %>')">
-                        <i class="fas fa-shopping-cart"></i>
-                        Add to Cart
-                      </button>
-                    <% } else { %>
-                      <a href="/user/signin" class="add-to-cart login-required">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Login to Add to Cart
-                      </a>
-                    <% } %>
                   </div>
-                </div>
-              <% }); %>
-            <% } %>
+                <% }); %>
+              <% } %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Flash messages -->
-  <% if(successMsg || errorMsg) { %>
-    <div class="row mt-3 mb-3">
-      <div class="col-md-12 m-auto">
-        <% if (successMsg) { %>
-          <div id="success" class="alert alert-success">
-            <%= successMsg %>
-          </div>
-        <% } else { %>
-          <div id="success" class="alert alert-success d-none"></div>
-        <% } %>
-      </div>
-      <div class="col-md-12 m-auto">
-        <% if (errorMsg) { %>
-          <div id="error" class="alert alert-danger">
-            <%= errorMsg %>
-          </div>
-        <% } else { %>
-          <div id="error" class="alert alert-danger d-none"></div>
-        <% } %>
-      </div>
-    </div>
-  <% } %>
-
-  <!-- Featured Categories -->
-  <section class="featured-categories">
-    <div class="container">
-      <h2 class="section-title text-center mb-5">Featured Categories</h2>
-      <div class="row">
-        <% if (categories && categories.length > 0) { %>
-          <% categories.forEach(function(category) { %>
-            <div class="col-md-4 mb-4">
-              <a href="/products/<%= category.slug %>" class="category-card">
-                <div class="category-image">
-                  <img src="/images/<%= category.slug %>.jpg" alt="<%= category.title %>" 
-                       onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
-                </div>
-                <h3><%= category.title %></h3>
-              </a>
+    <!-- Flash messages -->
+    <% if(successMsg || errorMsg) { %>
+      <div class="row mt-3 mb-3">
+        <div class="col-md-12 m-auto">
+          <% if (successMsg) { %>
+            <div id="success" class="alert alert-success">
+              <%= successMsg %>
             </div>
-          <% }); %>
-        <% } %>
+          <% } else { %>
+            <div id="success" class="alert alert-success d-none"></div>
+          <% } %>
+        </div>
+        <div class="col-md-12 m-auto">
+          <% if (errorMsg) { %>
+            <div id="error" class="alert alert-danger">
+              <%= errorMsg %>
+            </div>
+          <% } else { %>
+            <div id="error" class="alert alert-danger d-none"></div>
+          <% } %>
+        </div>
       </div>
-    </div>
-  </section>
+    <% } %>
 
-  <!-- Trending Products -->
-  <section class="trending-section">
-    <div class="container">
-      <h2 class="section-title text-center mb-5">Trending Products</h2>
-      <div class="trending-grid">
-        <% if (products && products.length > 0) { %>
-          <% products.slice(0, 6).forEach(function(product) { %>
-            <div class="trending-card">
-              <img src="<%= product.imagePath %>" alt="<%= product.title %>"
-                   onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
-              <div class="trending-content">
-                <h3><%= product.title %></h3>
-                <p>₹<%= product.price %></p>
-                <a href="/products/<%= product.category.slug %>/<%= product._id %>" class="btn btn-primary">View Details</a>
+    <!-- Featured Categories -->
+    <section class="featured-categories">
+      <div class="container">
+        <h2 class="section-title text-center mb-5">Featured Categories</h2>
+        <div class="row">
+          <% if (categories && categories.length > 0) { %>
+            <% categories.forEach(function(category) { %>
+              <div class="col-md-4 mb-4">
+                <a href="/products/<%= category.slug %>" class="category-card">
+                  <div class="category-image">
+                    <img src="/images/<%= category.slug %>.jpg" alt="<%= category.title %>" 
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
+                  </div>
+                  <h3><%= category.title %></h3>
+                </a>
               </div>
-            </div>
-          <% }); %>
-        <% } %>
-      </div>
-    </div>
-  </section>
-
-  <!-- Newsletter Section -->
-  <section class="newsletter-section text-center">
-    <div class="container">
-      <h3>Subscribe to Our Newsletter</h3>
-      <p class="mb-4">Stay updated with our latest products and offers</p>
-      <form class="newsletter-form">
-        <div class="input-group">
-          <input type="email" class="form-control" placeholder="Enter your email" required>
-          <div class="input-group-append">
-            <button class="btn btn-dark" type="submit">Subscribe</button>
-          </div>
+            <% }); %>
+          <% } %>
         </div>
-      </form>
-    </div>
-  </section>
+      </div>
+    </section>
 
-  <style>
-    :root {
-      --primary-color: #2563eb;
-      --secondary-color: #3b82f6;
-      --accent-color: #60a5fa;
-      --background-color: #f8fafc;
-      --text-color: #1e293b;
-      --border-color: #e2e8f0;
-    }
+    <!-- Trending Products -->
+    <section class="trending-section">
+      <div class="container">
+        <h2 class="section-title text-center mb-5">Trending Products</h2>
+        <div class="trending-grid">
+          <% if (products && products.length > 0) { %>
+            <% products.slice(0, 6).forEach(function(product) { %>
+              <div class="trending-card">
+                <img src="<%= product.imagePath %>" alt="<%= product.title %>"
+                     onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
+                <div class="trending-content">
+                  <h3><%= product.title %></h3>
+                  <p>₹<%= product.price %></p>
+                  <a href="/products/<%= product.category.slug %>/<%= product._id %>" class="btn btn-primary">View Details</a>
+                </div>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+      </div>
+    </section>
 
-    /* Main Content */
-    .main-content {
-      background: var(--background-color);
-    }
+    <!-- Newsletter Section -->
+    <section class="newsletter-section text-center">
+      <div class="container">
+        <h3>Subscribe to Our Newsletter</h3>
+        <p class="mb-4">Stay updated with our latest products and offers</p>
+        <form class="newsletter-form">
+          <div class="input-group">
+            <input type="email" class="form-control" placeholder="Enter your email" required>
+            <div class="input-group-append">
+              <button class="btn btn-dark" type="submit">Subscribe</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</main>
 
-    /* Sidebar */
-    .categories-sidebar {
-      background: white;
-      padding: 1rem;
-      height: 100%;
-      border-right: 1px solid var(--border-color);
-    }
+<style>
+  /* Main wrapper */
+  .main-wrapper {
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+    background: transparent;
+  }
 
-    .category-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+  /* Main Content */
+  .main-content {
+    background: transparent;
+    position: relative;
+    z-index: 1;
+  }
 
-    .category-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem;
-      color: var(--text-color);
-      text-decoration: none;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      font-size: 0.9rem;
-    }
+  /* Remove any overlapping backgrounds */
+  .container-fluid {
+    background: transparent;
+  }
 
-    .category-link:hover,
-    .category-link.active {
-      background: var(--primary-color);
-      color: white;
-    }
+  /* Sidebar */
+  .categories-sidebar {
+    background: white;
+    padding: 1rem;
+    height: 100%;
+    border-right: 1px solid var(--border-color);
+  }
 
-    /* Search */
-    .search-container {
-      margin-bottom: 1rem;
-      position: relative;
-    }
+  .category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-    .search-input {
-      padding: 0.5rem 2rem 0.5rem 0.5rem;
-      font-size: 0.9rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-    }
+  .category-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+  }
 
-    .search-btn {
-      position: absolute;
-      right: 0.25rem;
-      top: 50%;
-      transform: translateY(-50%);
-      padding: 0.25rem;
-      font-size: 0.8rem;
-    }
+  .category-link:hover,
+  .category-link.active {
+    background: var(--primary-color);
+    color: white;
+  }
 
-    /* Product Grid */
-    .product-section {
-      padding: 1rem;
-    }
+  /* Search */
+  .search-container {
+    margin-bottom: 1rem;
+    position: relative;
+  }
 
+  .search-input {
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+  }
+
+  .search-btn {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  /* Product Grid */
+  .product-section {
+    padding: 1rem;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .product-image-wrapper {
+    position: relative;
+    padding-top: 75%;
+  }
+
+  .product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-info {
+    padding: 0.75rem;
+  }
+
+  .product-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .product-price {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .add-to-cart {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+  }
+
+  .badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 768px) {
     .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
-
-    .product-card {
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-    }
-
-    .product-image-wrapper {
-      position: relative;
-      padding-top: 75%;
-    }
-
-    .product-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .product-info {
-      padding: 0.75rem;
-    }
-
-    .product-title {
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .product-price {
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .add-to-cart {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 0.8rem;
-      border-radius: 4px;
-    }
-
-    .badge {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.7rem;
-    }
-
-    @media (max-width: 768px) {
-      .product-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      }
-    }
-  </style>
-
-  <script>
-    function showProducts() {
-      const productSection = document.getElementById('productGridSection');
-      productSection.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const productSearch = document.getElementById('productSearch');
-      const productGrid = document.querySelector('.product-grid');
-      
-      let searchTimeout;
-      productSearch.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-          const searchTerm = this.value.toLowerCase();
-          const productCards = document.querySelectorAll('.product-card');
-          let hasResults = false;
-          
-          productCards.forEach(card => {
-            const title = card.querySelector('.product-title').textContent.toLowerCase();
-            if (title.includes(searchTerm)) {
-              card.style.display = 'block';
-              hasResults = true;
-            } else {
-              card.style.display = 'none';
-            }
-          });
-          
-          if (!hasResults) {
-            const noResults = document.createElement('div');
-            noResults.className = 'text-center py-3';
-            noResults.innerHTML = `No products found matching "${searchTerm}"`;
-            productGrid.appendChild(noResults);
-          }
-        }, 300);
-      });
-    });
-  </script>
-
-  <%- include('./partials/pagination') %>
-</div>
+  }
+</style>
 
 <script>
-  // Force hero section to be visible
+  function showProducts() {
+    const productSection = document.getElementById('productGridSection');
+    productSection.scrollIntoView({ behavior: 'smooth' });
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
-    const heroSection = document.querySelector('.hero-section');
-    if (heroSection) {
-      heroSection.style.display = 'block';
-      heroSection.style.visibility = 'visible';
-      console.log('Hero section found and made visible');
-    } else {
-      console.error('Hero section element not found');
+    const productSearch = document.getElementById('productSearch');
+    const productGrid = document.querySelector('.product-grid');
+    
+    let searchTimeout;
+    productSearch.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const searchTerm = this.value.toLowerCase();
+        const productCards = document.querySelectorAll('.product-card');
+        let hasResults = false;
+        
+        productCards.forEach(card => {
+          const title = card.querySelector('.product-title').textContent.toLowerCase();
+          if (title.includes(searchTerm)) {
+            card.style.display = 'block';
+            hasResults = true;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        if (!hasResults) {
+          const noResults = document.createElement('div');
+          noResults.className = 'text-center py-3';
+          noResults.innerHTML = `No products found matching "${searchTerm}"`;
+          productGrid.appendChild(noResults);
+        }
+      }, 300);
+    });
+  });
+
+  // Remove any script that might be affecting the welcome banner visibility
+  document.addEventListener('DOMContentLoaded', function() {
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.style.background = 'transparent';
     }
   });
 </script>
+
+<%- include('./partials/pagination') %>
 
 <%- include('./partials/footer') %>

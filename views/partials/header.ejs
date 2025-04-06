@@ -1,8 +1,9 @@
-<!-- Logo and Search Bar -->
+<!-- Site Header -->
 <header class="site-header">
-  <div class="header-top">
+  <!-- Top Navigation -->
+  <nav class="navbar">
     <div class="container">
-      <div class="row align-items-center">
+      <div class="row align-items-center w-100">
         <div class="col-md-2">
           <a href="/" class="logo">
             <img src="/images/logo.png" alt="TechTraders Logo" class="img-fluid">
@@ -25,97 +26,108 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Welcome Section -->
-  <div class="welcome-banner">
-    <div class="container">
-      <div class="welcome-content">
-        <h1>Welcome to TechTraders</h1>
-        <p>Premium Electronics Store</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Service Navigation -->
-  <div class="service-nav">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-4 text-center">
-          <a href="#products" class="service-item" onclick="showProducts()">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Shopping</span>
-          </a>
-        </div>
-        <div class="col-md-4 text-center">
-          <a href="/b2b" class="service-item">
-            <i class="fas fa-handshake"></i>
-            <span>B2B Portal</span>
-          </a>
-        </div>
-        <div class="col-md-4 text-center">
-          <a href="/custom-projects" class="service-item">
-            <i class="fas fa-project-diagram"></i>
-            <span>Custom Projects</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+  </nav>
 </header>
 
+<!-- Welcome Banner -->
+<div class="welcome-banner">
+  <div class="container">
+    <div class="welcome-content text-center">
+      <h1>Welcome to TechTraders</h1>
+      <p>Premium Electronics Store</p>
+    </div>
+  </div>
+</div>
+
+<!-- Service Navigation -->
+<div class="service-nav">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-4 text-center">
+        <a href="#products" class="service-item" onclick="showProducts()">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Shopping</span>
+        </a>
+      </div>
+      <div class="col-md-4 text-center">
+        <a href="/b2b" class="service-item">
+          <i class="fas fa-handshake"></i>
+          <span>B2B Portal</span>
+        </a>
+      </div>
+      <div class="col-md-4 text-center">
+        <a href="/custom-projects" class="service-item">
+          <i class="fas fa-project-diagram"></i>
+          <span>Custom Projects</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
-  /* Site Header styles */
+  /* Site Header */
   .site-header {
     position: relative;
-    z-index: 1000;
+    z-index: 2;
+  }
+
+  .navbar {
     background: white;
-  }
-
-  /* Header Top styles */
-  .header-top {
     padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
-  /* Welcome Banner styles */
+  .logo img {
+    height: 60px;
+    width: auto;
+  }
+
+  /* Welcome Banner */
   .welcome-banner {
     background: linear-gradient(135deg, #2563eb, #60a5fa);
-    padding: 2rem 0;
+    padding: 3rem 0;
     margin: 0;
-    text-align: center;
+    position: relative;
+    z-index: 1;
+    display: block !important;
+    visibility: visible !important;
   }
 
   .welcome-content {
     color: white;
+    position: relative;
+    z-index: 2;
   }
 
   .welcome-content h1 {
-    font-size: 2rem;
+    font-size: 2.5rem;
     font-weight: 600;
     margin: 0;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
   .welcome-content p {
-    font-size: 1.1rem;
-    margin: 0.5rem 0 0;
+    font-size: 1.2rem;
+    margin: 1rem 0 0;
     opacity: 0.9;
   }
 
-  /* Service Navigation styles */
+  /* Service Navigation */
   .service-nav {
     background: white;
-    padding: 1rem 0;
+    padding: 2rem 0;
     border-bottom: 1px solid var(--border-color);
+    position: relative;
+    z-index: 1;
   }
 
   .service-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
+    gap: 1rem;
+    padding: 1.5rem;
     color: var(--primary-color);
     text-decoration: none;
     border-radius: 8px;
@@ -129,21 +141,31 @@
   }
 
   .service-item i {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
   .service-item span {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     font-weight: 500;
   }
 
+  /* Override any conflicting styles */
+  body {
+    background-color: var(--background-color) !important;
+  }
+
+  .main-wrapper {
+    background: transparent !important;
+  }
+
+  /* Responsive Design */
   @media (max-width: 768px) {
     .welcome-banner {
-      padding: 1.5rem 0;
+      padding: 2rem 0;
     }
 
     .welcome-content h1 {
-      font-size: 1.75rem;
+      font-size: 2rem;
     }
 
     .welcome-content p {
@@ -157,8 +179,22 @@
     
     .service-item {
       width: 100%;
-      max-width: 200px;
+      max-width: 250px;
       margin: 0.5rem 0;
+      padding: 1rem;
     }
   }
-</style> 
+</style>
+
+<script>
+  // Ensure welcome banner is visible
+  document.addEventListener('DOMContentLoaded', function() {
+    const welcomeBanner = document.querySelector('.welcome-banner');
+    if (welcomeBanner) {
+      welcomeBanner.style.display = 'block';
+      welcomeBanner.style.visibility = 'visible';
+      welcomeBanner.style.opacity = '1';
+      console.log('Welcome banner found and made visible');
+    }
+  });
+</script> 
