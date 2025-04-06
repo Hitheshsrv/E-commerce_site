@@ -122,11 +122,10 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-var port = process.env.PORT || 3000;
-app.set("port", port);
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running at http://13.233.103.234:${port}`);
-
+const PORT = process.env.PORT || 3000;
+app.set("port", PORT);
+app.listen(PORT, 'localhost', () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
 
 module.exports = app;

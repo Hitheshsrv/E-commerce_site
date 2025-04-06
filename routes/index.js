@@ -368,6 +368,34 @@ async function productsFromCart(cart) {
   return products;
 }
 
+// B2B Client Portal
+router.get("/b2b", async (req, res) => {
+  try {
+    res.render("pages/b2b", {
+      pageName: "B2B Client Portal",
+      successMsg: req.flash("success")[0],
+      errorMsg: req.flash("error")[0],
+    });
+  } catch (error) {
+    console.log(error);
+    res.redirect("/");
+  }
+});
+
+// Custom Projects
+router.get("/custom-projects", async (req, res) => {
+  try {
+    res.render("pages/custom-projects", {
+      pageName: "Custom Projects",
+      successMsg: req.flash("success")[0],
+      errorMsg: req.flash("error")[0],
+    });
+  } catch (error) {
+    console.log(error);
+    res.redirect("/");
+  }
+});
+
 module.exports = router;
 // Helper function to validate payment signature
 function validatePaymentSignature(razorpay_signature, sign) {

@@ -1,0 +1,100 @@
+<%- include("../shop/partials/header") %>
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-12 text-center mb-5">
+      <h1>Custom Projects</h1>
+      <p class="lead">Get tailored solutions for your unique needs</p>
+    </div>
+  </div>
+
+  <!-- Project Categories -->
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-microchip"></i> Hardware Development</h5>
+          <p class="card-text">Custom hardware solutions designed and built to your specifications.</p>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-check text-success"></i> PCB Design</li>
+            <li><i class="fas fa-check text-success"></i> Prototypes</li>
+            <li><i class="fas fa-check text-success"></i> 3D Printing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-code"></i> Software Development</h5>
+          <p class="card-text">Custom software and firmware development services.</p>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-check text-success"></i> Website Development</li>
+            <li><i class="fas fa-check text-success"></i> App Development</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-cogs"></i> Consulting</h5>
+          <p class="card-text">Expert guidance for your technical projects.</p>
+          <ul class="list-unstyled">
+            <li><i class="fas fa-check text-success"></i> Technical Planning</li>
+            <li><i class="fas fa-check text-success"></i> Feasibility Studies</li>
+            <li><i class="fas fa-check text-success"></i> PPT and Report Writing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Request Form -->
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title text-center mb-4">Start Your Project</h3>
+          <form action="/custom-projects/submit" method="POST">
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="projectType">Project Type</label>
+              <select class="form-control" id="projectType" name="projectType" required>
+                <option value="">Select Project Type</option>
+                <option value="hardware">Hardware Development</option>
+                <option value="software">Software Development</option>
+                <option value="consulting">Consulting</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="budget">Estimated Budget</label>
+              <select class="form-control" id="budget" name="budget" required>
+                <option value="">Select Budget Range</option>
+                <option value="small">₹10,000 - ₹50,000</option>
+                <option value="medium">₹50,000 - ₹2,00,000</option>
+                <option value="large">₹2,00,000+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="description">Project Description</label>
+              <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+            </div>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-primary btn-block">Submit Project Request</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("../shop/partials/footer") %> 

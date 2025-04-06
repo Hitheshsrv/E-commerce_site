@@ -1,4 +1,4 @@
-# BestBags
+PNBK FPV store
 
 ## Table of contents
 
@@ -18,12 +18,6 @@ A virtual ecommerce website using Node js, Express js, and Mongoose.
 NOTE: Please read the RUN section before opening an issue.
 
 ## Demo
-
-
-
-The application is deployed to Heroku and can be accessed through the following link:
-
-[BestBags on Heroku](https://best-bags.herokuapp.com/)
 
 The website resembles a real store and you can add products to your cart and pay for them. The payment is processed using Razorpay. Please <u><b>DO NOT</b></u> provide real payment information during testing.
 
