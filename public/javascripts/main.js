@@ -18,21 +18,21 @@ function addToCart(productId) {
     method: 'GET',
     success: function(response) {
       if (response.success) {
-        // Update cart badge
-        const cartBadge = $('.cart-badge');
+        // Update cart badge - only target the header cart icon
+        const cartBadge = $('.nav-icons .cart-icon .cart-badge');
         if (cartBadge.length) {
           cartBadge.text(response.totalQty);
         } else {
-          $('.fa-shopping-cart').after('<span class="cart-badge">' + response.totalQty + '</span>');
+          $('.nav-icons .cart-icon .fa-shopping-cart').after('<span class="cart-badge">' + response.totalQty + '</span>');
         }
         
         // Show success message
-        showAlert('success', 'Product added to cart successfully!');
+        showAlert('success', response.message || 'Product added to cart successfully!');
       } else {
-        showAlert('danger', 'Failed to add product to cart.');
+        showAlert('danger', response.message || 'Failed to add product to cart.');
       }
     },
-    error: function() {
+    error: function(xhr, status, error) {
       showAlert('danger', 'An error occurred. Please try again.');
     }
   });
@@ -40,6 +40,9 @@ function addToCart(productId) {
 
 // Show Alert Function
 function showAlert(type, message) {
+  // Remove any existing alerts
+  $('.alert-dismissible').remove();
+  
   const alertDiv = $('<div>')
     .addClass('alert alert-' + type + ' alert-dismissible fade show')
     .attr('role', 'alert')
@@ -47,13 +50,10 @@ function showAlert(type, message) {
           '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
           '<span aria-hidden="true">&times;</span></button>');
   
-  // Remove any existing alerts
-  $('.alert').remove();
+  // Add alert to the page
+  $('.container').prepend(alertDiv);
   
-  // Add the new alert at the top of the main content
-  $('main').prepend(alertDiv);
-  
-  // Auto dismiss after 3 seconds
+  // Auto-dismiss after 3 seconds
   setTimeout(function() {
     alertDiv.alert('close');
   }, 3000);

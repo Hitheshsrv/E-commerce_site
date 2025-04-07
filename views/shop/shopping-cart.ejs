@@ -3,63 +3,53 @@
   <% if (cart != null && !cart.paid ) { %>
   <div class="row">
     <div class="col-md-11 col-sm-12 m-auto table-responsive">
-      <table class="table text-center">
+      <table class="table table-hover text-center cart-table">
         <thead>
-          <tr >
-            <th>Product</th>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-            <th>Quantity</th>
-            <th>&nbsp;</th>
-            <th>Total</th>
-            <th>Subtotal</th>
-            <th>&nbsp;</th>
+          <tr>
+            <th style="width: 15%">Image</th>
+            <th style="width: 25%">Product</th>
+            <th style="width: 10%">Quantity</th>
+            <th style="width: 10%">Price</th>
+            <th style="width: 10%">Total</th>
+            <th style="width: 30%">Actions</th>
           </tr>
         </thead>
         <tbody>
           <% products.forEach( product => { %> <% if(product != null) {%>
-          <tr class="my-auto">
+          <tr>
             <td>
-              <a
-              href="/products/<%=product.category.slug%>/<%=product._id%>"
-            >
-              <img src="<%=product.imagePath%>" class="img-small image-fluid" alt="image thumbnail" />
+              <a href="/products/<%=product.category.slug%>/<%=product._id%>">
+                <img src="<%=product.imagePath%>" class="cart-img" alt="product thumbnail" />
               </a>
             </td>
             <td>
-              <div class="float-left mb-3">
-                <a class="title-link"
-                href="/products/<%=product.category.slug%>/<%=product._id%>"
-              >
-                <h6 class="text-left"><%= product.title %></h6> 
-                <p class="text-left">Product No: <%= product.productCode %></p>
+              <a class="product-title" href="/products/<%=product.category.slug%>/<%=product._id%>">
+                <h6><%= product.title %></h6>
+                <small class="text-muted">Code: <%= product.productCode %></small>
+              </a>
+            </td>
+            <td>
+              <div class="quantity-controls">
+                <a href="/reduce/<%=product._id%>" class="btn btn-sm btn-outline-secondary">
+                  <i class="fa fa-minus"></i>
+                </a>
+                <span class="quantity"><%= product.qty %></span>
+                <a href="/add-to-cart/<%=product._id%>" class="btn btn-sm btn-outline-secondary">
+                  <i class="fa fa-plus"></i>
+                </a>
               </div>
-              
-              </a>
             </td>
-            <td class="text-center">
-              <a href="/add-to-cart/<%=product._id%>"
-                ><i class="fa fa-plus-square" aria-hidden="true"></i
-              > </a>
-            </td>
-            <td class="text-center">
-              <p class="qty-display pt-1">
-              <%= product.qty %>
-            </p>
-          </td>
-            <td class="text-center" >
-              <a href="/reduce/<%=product._id%>"
-                ><i class="fa fa-minus-square" aria-hidden="true"></i
-              ></a>
-            </td>
-            <td>$<%= product.price %></td>
-            <td>$<%= product.totalPrice %></td>
+            <td>₹<%= product.price %></td>
+            <td>₹<%= product.totalPrice %></td>
             <td>
-              <a
-                href="/removeAll/<%=product._id%>"
-                class="btn btn-danger btn-sm button-style-danger"
-                >Remove all</a
-              >
+              <div class="btn-group">
+                <a href="/removeOne/<%=product._id%>" class="btn btn-warning btn-sm">
+                  <i class="fa fa-minus"></i> One
+                </a>
+                <a href="/removeAll/<%=product._id%>" class="btn btn-danger btn-sm">
+                  <i class="fa fa-trash"></i> All
+                </a>
+              </div>
             </td>
           </tr>
           <% } %> <% }) %>
@@ -67,15 +57,11 @@
       </table>
     </div>
   </div>
-<hr>
-  <div class="row mt-4 mr-auto">
-    <div class="col-md-11 col-sm-12 m-auto">
-      <strong>Total: <%= cart.totalCost %> </strong>
-    </div>
-  </div>
-  <div class="row mt-2 mr-auto">
-    <div class="col-md-11 col-sm-12 m-auto">
-      <a href="/checkout" class="btn btn-dark button-style">Checkout</a>
+  <hr>
+  <div class="row mt-3">
+    <div class="col-md-11 col-sm-12 m-auto text-right">
+      <h5>Total: ₹<%= cart.totalCost %></h5>
+      <a href="/checkout" class="btn btn-primary mt-2">Proceed to Checkout</a>
     </div>
   </div>
   <% } else { %>
@@ -84,8 +70,59 @@
       <h2>No items in the cart</h2>
     </div>
   </div>
-
   <% } %>
 </div>
+
+<style>
+.cart-table {
+  font-size: 0.9rem;
+}
+
+.cart-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-title {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-title h6 {
+  margin-bottom: 0.2rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.quantity {
+  min-width: 30px;
+  text-align: center;
+}
+
+.btn-group {
+  gap: 0.3rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+}
+
+.table td {
+  vertical-align: middle;
+}
+</style>
 
 <%- include("partials/footer") %>

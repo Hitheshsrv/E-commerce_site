@@ -41,8 +41,11 @@
           </div>
         </div>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div class="text-right mb-3">
+          <h4>Total Amount: ₹<%= total %></h4>
+        </div>
       </div>
-      <button id="submit-btn" type="submit" class="btn btn-dark button-style">
+      <button id="submit-btn" type="submit" class="btn btn-primary button-style">
         Pay Now
       </button>
     </form>
