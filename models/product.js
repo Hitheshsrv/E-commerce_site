@@ -34,6 +34,9 @@ const productSchema = Schema({
     type: Boolean,
     required: true,
   },
+  externalLink: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

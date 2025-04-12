@@ -1,0 +1,111 @@
+<%- include("partials/header") %>
+
+<div class="container my-5">
+  <div class="row">
+    <div class="col-12 text-center mb-5">
+      <h1>Projects & Kits</h1>
+      <p class="lead">Explore our ready-to-build project kits and solutions</p>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  <% if(successMsg || errorMsg) { %>
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <% if (successMsg) { %>
+          <div class="alert alert-success">
+            <%= successMsg %>
+          </div>
+        <% } %>
+        <% if (errorMsg) { %>
+          <div class="alert alert-danger">
+            <%= errorMsg %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Category Filter -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary active" data-category="all">All</button>
+        <button type="button" class="btn btn-outline-primary" data-category="robotics">Robotics</button>
+        <button type="button" class="btn btn-outline-primary" data-category="iot">IoT</button>
+        <button type="button" class="btn btn-outline-primary" data-category="electronics">Electronics</button>
+        <button type="button" class="btn btn-outline-primary" data-category="drones">Drones</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="row">
+    <% if (projects && projects.length > 0) { %>
+      <% projects.forEach(function(project) { %>
+        <div class="col-md-4 mb-4 project-card" data-category="<%= project.category %>">
+          <div class="card h-100">
+            <img src="<%= project.imagePath %>" class="card-img-top" alt="<%= project.title %>"
+                 onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
+            <div class="card-body">
+              <div class="mb-2">
+                <span class="badge bg-primary"><%= project.category %></span>
+                <span class="badge bg-info"><%= project.difficulty %></span>
+              </div>
+              <h5 class="card-title"><%= project.title %></h5>
+              <p class="card-text"><%= project.description %></p>
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">₹<%= project.price %></h6>
+                <% if(project.available) { %>
+                  <a href="/add-to-cart/<%= project._id %>" class="btn btn-primary">Add to Cart</a>
+                <% } else { %>
+                  <button class="btn btn-secondary" disabled>Out of Stock</button>
+                <% } %>
+              </div>
+              <div class="mt-2">
+                <a href="/projects/<%= project.projectCode %>" class="btn btn-outline-info btn-sm w-100">
+                  <i class="fas fa-info-circle"></i> View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="col-12 text-center">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i> No projects available at the moment.
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Category Filter Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterButtons = document.querySelectorAll('[data-category]');
+  const projectCards = document.querySelectorAll('.project-card');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Remove active class from all buttons
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      // Add active class to clicked button
+      button.classList.add('active');
+
+      const category = button.dataset.category;
+      
+      projectCards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+});
+</script>
+
+<%- include("partials/footer") %> 

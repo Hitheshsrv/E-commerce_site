@@ -2,9 +2,9 @@
 <html>
   <head>
     <% if (pageName) { %>
-    <title>EpicFPV | <%= pageName %></title>
+    <title>TaskNTrade.in | <%= pageName %></title>
     <%} else {%>
-    <title>EpicFPV</title>
+    <title>TaskNTrade.in</title>
     <% } %>
     <meta name="csrf-token" content="<%= csrfToken %>">
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -99,14 +99,14 @@
           <div class="container-fluid">
             <!-- Logo -->
             <a class="navbar-brand" href="/">
-              <img src="/images/epic-logo.png" alt="EpicFPV" class="logo">
+              <img src="/images/taskntrade-logo.png" alt="TaskNTrade.in" class="logo">
             </a>
 
             <!-- Search Bar -->
             <div class="search-container flex-grow-1">
               <form class="search-form" action="/products/search" method="GET">
                 <div class="input-group">
-                  <input type="search" class="form-control search-input" placeholder="Search for products..." name="search">
+                  <input type="search" class="form-control search-input" placeholder="Search for products..." name="search" required minlength="2">
                   <div class="input-group-append">
                     <button class="btn btn-search" type="submit">
                       <i class="fas fa-search"></i>
@@ -153,21 +153,28 @@
         <div class="main-services-nav">
           <div class="container-fluid">
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <a href="/products" class="service-card">
                   <i class="fas fa-shopping-cart"></i>
                   <h3>Shopping</h3>
                   <p>Browse and purchase from our wide range of products</p>
                 </a>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
+                <a href="/projects" class="service-card">
+                  <i class="fas fa-tools"></i>
+                  <h3>Projects</h3>
+                  <p>Explore DIY kits and project materials</p>
+                </a>
+              </div>
+              <div class="col-md-3">
                 <a href="/b2b" class="service-card">
                   <i class="fas fa-handshake"></i>
                   <h3>B2B Client Portal</h3>
                   <p>Business solutions and bulk ordering</p>
                 </a>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <a href="/custom-projects" class="service-card">
                   <i class="fas fa-project-diagram"></i>
                   <h3>Custom Projects</h3>

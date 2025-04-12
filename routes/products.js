@@ -26,16 +26,22 @@ router.get("/", async (req, res) => {
       .populate("category");
 
     const count = await Product.countDocuments();
+    const categories = await Category.find({}).sort('title');
 
     res.render("shop/index", {
       pageName: "All Products",
       products,
+      categories,
       successMsg,
       errorMsg,
       current: page,
       breadcrumbs: null,
       home: "/products/?",
       pages: Math.ceil(count / perPage),
+      searchTerm: '',
+      currentCategory: null,
+      login: req.isAuthenticated(),
+      session: req.session
     });
   } catch (error) {
     console.log(error);
@@ -49,31 +55,49 @@ router.get("/search", async (req, res) => {
   let page = parseInt(req.query.page) || 1;
   const successMsg = req.flash("success")[0];
   const errorMsg = req.flash("error")[0];
+  const searchTerm = req.query.search || '';
 
   try {
-    const products = await Product.find({
-      title: { $regex: req.query.search, $options: "i" },
-    })
+    const searchQuery = {
+      $or: [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+        { productCode: { $regex: searchTerm, $options: "i" } }
+      ]
+    };
+
+    const products = await Product.find(searchQuery)
       .sort("-createdAt")
       .skip(perPage * page - perPage)
       .limit(perPage)
-      .populate("category")
-      .exec();
-    const count = await Product.countDocuments({
-      title: { $regex: req.query.search, $options: "i" },
-    });
+      .populate("category");
+
+    const count = await Product.countDocuments(searchQuery);
+    const categories = await Category.find({}).sort('title');
+
+    // Check if the search term matches any category
+    const matchingCategory = categories.find(cat => 
+      cat.title.toLowerCase() === searchTerm.toLowerCase()
+    );
+
     res.render("shop/index", {
-      pageName: "Search Results",
+      pageName: searchTerm ? `Search: ${searchTerm}` : "All Products",
       products,
-      successMsg,
-      errorMsg,
+      categories,
+      successMsg: products.length > 0 ? `Found ${products.length} products ${searchTerm ? `matching "${searchTerm}"` : ''}` : null,
+      errorMsg: products.length === 0 ? `No products found ${searchTerm ? `matching "${searchTerm}"` : ''}` : null,
       current: page,
       breadcrumbs: null,
-      home: "/products/search?search=" + req.query.search + "&",
+      home: "/products/search?search=" + searchTerm + "&",
       pages: Math.ceil(count / perPage),
+      searchTerm: searchTerm,
+      currentCategory: matchingCategory || null,
+      login: req.isAuthenticated(),
+      session: req.session
     });
   } catch (error) {
     console.log(error);
+    req.flash('error', 'Error searching products');
     res.redirect("/");
   }
 });
@@ -120,7 +144,7 @@ router.get("/api/filter/:category", async (req, res) => {
   }
 });
 
-//GET: get a certain category by its slug (this is used for the categories navbar)
+//GET: get a certain category by its slug
 router.get("/:slug", async (req, res) => {
   const successMsg = req.flash("success")[0];
   const errorMsg = req.flash("error")[0];
@@ -128,6 +152,11 @@ router.get("/:slug", async (req, res) => {
   let page = parseInt(req.query.page) || 1;
   try {
     const foundCategory = await Category.findOne({ slug: req.params.slug });
+    if (!foundCategory) {
+      req.flash('error', 'Category not found');
+      return res.redirect("/products");
+    }
+
     const allProducts = await Product.find({ category: foundCategory.id })
       .sort("-createdAt")
       .skip(perPage * page - perPage)
@@ -135,21 +164,27 @@ router.get("/:slug", async (req, res) => {
       .populate("category");
 
     const count = await Product.countDocuments({ category: foundCategory.id });
+    const categories = await Category.find({}).sort('title');
 
     res.render("shop/index", {
       pageName: foundCategory.title,
       currentCategory: foundCategory,
       products: allProducts,
+      categories,
       successMsg,
       errorMsg,
       current: page,
       breadcrumbs: req.breadcrumbs,
       home: "/products/" + req.params.slug.toString() + "/?",
       pages: Math.ceil(count / perPage),
+      searchTerm: '',
+      login: req.isAuthenticated(),
+      session: req.session
     });
   } catch (error) {
     console.log(error);
-    return res.redirect("/");
+    req.flash('error', 'Error loading category');
+    return res.redirect("/products");
   }
 });
 

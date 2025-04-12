@@ -1,0 +1,76 @@
+<%- include("partials/header") %>
+
+<div class="container my-5">
+  <!-- Project Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1><%= project.title %></h1>
+      <p class="lead"><%= project.description %></p>
+      <div class="project-meta">
+        <span class="badge bg-primary"><%= project.category %></span>
+        <span class="badge bg-info"><%= project.difficulty %></span>
+        <span class="badge bg-secondary">Duration: <%= project.duration %></span>
+      </div>
+    </div>
+    <div class="col-md-4 text-end">
+      <h2 class="mb-3">₹<%= project.price %></h2>
+      <% if(project.available) { %>
+        <a href="/add-to-cart/<%= project._id %>" class="btn btn-primary btn-lg">Add to Cart</a>
+      <% } else { %>
+        <button class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Project Details -->
+  <div class="row">
+    <!-- Project Image -->
+    <div class="col-md-6 mb-4">
+      <img src="<%= project.imagePath %>" alt="<%= project.title %>" class="img-fluid rounded shadow"
+           onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFOUVDRUYiLz48cGF0aCBkPSJNODAgOTBIMTIwVjExMEg4MFY5MFoiIGZpbGw9IiM2Qzc1N0QiLz48cGF0aCBkPSJNNjUgNjVIMTM1Vjg1SDY1VjY1WiIgZmlsbD0iIzZDNzU3RCIvPjwvc3ZnPg=='">
+    </div>
+
+    <!-- Project Info -->
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3>Components Included</h3>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <% project.components.forEach(function(component) { %>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <%= component.name %>
+                <span class="badge bg-primary rounded-pill">×<%= component.quantity %></span>
+              </li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3>Skills You'll Learn</h3>
+        </div>
+        <div class="card-body">
+          <% project.skills.forEach(function(skill) { %>
+            <span class="badge bg-success me-2 mb-2"><%= skill %></span>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Documentation & Resources</h3>
+        </div>
+        <div class="card-body">
+          <a href="<%= project.documentation %>" target="_blank" class="btn btn-outline-primary">
+            <i class="fas fa-book-open"></i> View Documentation
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer") %> 
