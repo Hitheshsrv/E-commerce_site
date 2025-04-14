@@ -57,6 +57,7 @@
         <div class="card-body">
           <h3 class="card-title text-center mb-4">Start Your Project</h3>
           <form action="/custom-projects/submit" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div class="form-group">
               <label for="name">Your Name</label>
               <input type="text" class="form-control" id="name" name="name" required>
@@ -88,7 +89,6 @@
               <label for="description">Project Description</label>
               <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
             </div>
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit" class="btn btn-primary btn-block">Submit Project Request</button>
           </form>
         </div>

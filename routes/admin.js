@@ -1,146 +1,115 @@
-const AdminJS = require('adminjs')
-const AdminJSExpress = require('@adminjs/express')
-const AdminJSMongoose = require('@adminjs/mongoose')
-const mongoose = require("mongoose");
-const Product = require("../models/product");
-const User = require("../models/user");
-const Order = require("../models/order");
-const Category = require("../models/category");
-
-AdminJS.registerAdapter(AdminJSMongoose)
-
 const express = require("express");
-const app = express();
+const router = express.Router();
+const AdminJSExpress = require("@adminjs/express");
+const AdminJSMongoose = require("@adminjs/mongoose");
+const bcrypt = require("bcryptjs");
+const User = require("../models/user");
+const Product = require("../models/product");
+const Order = require("../models/order");
+const Project = require("../models/project");
+const CustomProjectRequest = require("../models/custom-project-request");
+const nodemailer = require("nodemailer");
 
-const adminJs = new AdminJS({
-  databases: [mongoose],
-  rootPath: "/admin",
-  branding: {
-    companyName: "BestBags",
-    logo: "/images/shop-icon.png",
-    favicon: "/images/shop-icon.png"
-  },
-  resources: [
-    {
-      resource: Product,
-      options: {
-        navigation: {
-          name: "Admin Content",
-          icon: "Inventory"
-        },
-        properties: {
-          description: {
-            type: "richtext",
-            isVisible: { list: false, filter: true, show: true, edit: true }
-          },
-          _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false }
-          },
-          title: {
-            isTitle: true
-          },
-          price: {
-            type: "number"
-          },
-          imagePath: {
-            isVisible: { list: false, filter: false, show: true, edit: true }
-          }
-        }
-      }
+(async () => {
+  // Dynamically import AdminJS
+  const AdminJS = (await import("adminjs")).default;
+
+  // Register the mongoose adapter
+  AdminJS.registerAdapter(AdminJSMongoose);
+
+  // Create reusable transporter object
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.GMAIL_EMAIL,
+      pass: process.env.GMAIL_PASSWORD,
     },
-    {
-      resource: User,
-      options: {
-        navigation: {
-          name: "User Content",
-          icon: "User"
-        },
-        properties: {
-          _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false }
-          },
-          username: {
-            isTitle: true
-          }
-        }
-      }
+    tls: {
+      rejectUnauthorized: false,
     },
-    {
-      resource: Order,
-      options: {
-        navigation: {
-          name: "User Content",
-          icon: "User"
+  });
+
+  // Create admin instance with custom configuration
+  const admin = new AdminJS({
+    resources: [
+      {
+        resource: User,
+        options: {
+          properties: {
+            password: {
+              isVisible: {
+                list: false,
+                edit: true,
+                filter: false,
+                show: false,
+              },
+            },
+          },
+          actions: {
+            new: {
+              before: async (request) => {
+                if (request.payload.password) {
+                  request.payload = {
+                    ...request.payload,
+                    password: await bcrypt.hash(request.payload.password, 10),
+                  };
+                }
+                return request;
+              },
+            },
+          },
         },
-        properties: {
-          user: {
-            isTitle: true
-          },
-          _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false }
-          },
-          paymentId: {
-            isVisible: { list: false, filter: true, show: true, edit: false }
-          },
-          address: {
-            isVisible: { list: false, filter: true, show: true, edit: false }
-          },
-          createdAt: {
-            isVisible: { list: true, filter: true, show: true, edit: false }
-          },
-          cart: {
-            isVisible: { list: false, filter: false, show: true, edit: false }
-          }
-        }
-      }
-    },
-    {
-      resource: Category,
-      options: {
-        navigation: {
-          name: "Admin Content",
-          icon: "Categories"
-        },
-        properties: {
-          _id: {
-            isVisible: { list: false, filter: true, show: true, edit: false }
-          },
-          slug: {
-            isVisible: { list: false, filter: false, show: false, edit: false }
-          },
-          title: {
-            isTitle: true
-          }
-        }
-      }
-    }
-  ],
-  locale: {
-    translations: {
-      labels: {
-        loginWelcome: "Admin Panel Login"
       },
-      messages: {
-        loginWelcome: "Please enter your credentials to log in and manage your website contents"
-      }
-    }
-  }
-});
+      Product,
+      Order,
+      Project,
+      CustomProjectRequest,
+    ],
+    branding: {
+      companyName: "ElectroHub Admin",
+      logo: false,
+    },
+    locale: {
+      language: "en",
+      translations: {
+        labels: {
+          User: "Users",
+          Product: "Products",
+          Order: "Orders",
+          Project: "Projects",
+          CustomProjectRequest: "Custom Project Requests",
+        },
+      },
+    },
+  });
 
-const ADMIN = {
-  email: process.env.ADMIN_EMAIL,
-  password: process.env.ADMIN_PASSWORD
-};
-
-const router = AdminJSExpress.buildAuthenticatedRouter(adminJs, {
-  authenticate: async (email, password) => {
-    if (ADMIN.password === password && ADMIN.email === email) {
-      return ADMIN;
+  // Create router with authentication
+  const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
+    admin,
+    {
+      authenticate: async (email, password) => {
+        const user = await User.findOne({ email });
+        if (user && user.isAdmin) {
+          const matched = await bcrypt.compare(password, user.password);
+          if (matched) {
+            return user;
+          }
+        }
+        return false;
+      },
+      cookiePassword: process.env.ADMIN_COOKIE_SECRET || "default-secret",
+    },
+    null,
+    {
+      resave: false,
+      saveUninitialized: true,
     }
-    return null;
-  },
-  cookieName: process.env.ADMIN_COOKIE_NAME,
-  cookiePassword: process.env.ADMIN_COOKIE_PASSWORD
-});
+  );
+
+  // Mount admin routes
+  router.use(admin.options.rootPath, adminRouter);
+})();
 
 module.exports = router;

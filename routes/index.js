@@ -8,6 +8,8 @@ const Cart = require("../models/cart");
 const Order = require("../models/order");
 const middleware = require("../middleware");
 const Project = require('../models/project');
+const nodemailer = require('nodemailer');
+const CustomProjectRequest = require('../models/custom-project-request');
 const router = express.Router();
 
 // Initialize Razorpay
@@ -345,5 +347,114 @@ async function productsFromCart(cart) {
   }
   return products;
 }
+
+// B2B Portal
+router.get("/b2b", (req, res) => {
+  res.render("pages/b2b", {
+    pageName: "B2B Portal",
+    successMsg: req.flash("success")[0],
+    errorMsg: req.flash("error")[0],
+    login: req.isAuthenticated(),
+    session: req.session,
+    csrfToken: req.csrfToken()
+  });
+});
+
+// Handle B2B contact form submission
+router.post("/b2b/contact", (req, res) => {
+  // Here you can add logic to handle B2B inquiries
+  // For now, just redirect with a success message
+  req.flash("success", "Your inquiry has been received. We'll contact you soon!");
+  res.redirect("/b2b");
+});
+
+// Custom Projects
+router.get("/custom-projects", (req, res) => {
+  res.render("pages/custom-projects", {
+    pageName: "Custom Projects",
+    successMsg: req.flash("success")[0],
+    errorMsg: req.flash("error")[0],
+    login: req.isAuthenticated(),
+    session: req.session,
+    csrfToken: req.csrfToken()
+  });
+});
+
+// Handle custom project form submission
+router.post("/custom-projects/submit", async (req, res) => {
+  try {
+    const { name, email, projectType, budget, description } = req.body;
+
+    // Create new custom project request
+    const newRequest = new CustomProjectRequest({
+      name,
+      email,
+      projectType,
+      budget,
+      description
+    });
+
+    // Save to database
+    await newRequest.save();
+
+    // Send email notification
+    const smtpTrans = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    const mailOpts = {
+      from: process.env.GMAIL_EMAIL,
+      to: process.env.GMAIL_EMAIL, // Admin email
+      subject: `New Custom Project Request from ${name}`,
+      html: `
+        <h2>New Custom Project Request</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Project Type:</strong> ${projectType}</p>
+        <p><strong>Budget Range:</strong> ${budget}</p>
+        <p><strong>Description:</strong></p>
+        <p>${description}</p>
+        <p><strong>Request ID:</strong> ${newRequest._id}</p>
+      `
+    };
+
+    await smtpTrans.sendMail(mailOpts);
+
+    // Send confirmation email to user
+    const userMailOpts = {
+      from: process.env.GMAIL_EMAIL,
+      to: email,
+      subject: "Custom Project Request Received",
+      html: `
+        <h2>Thank you for your custom project request!</h2>
+        <p>Dear ${name},</p>
+        <p>We have received your request for a custom project. Our team will review it and get back to you soon.</p>
+        <p><strong>Project Type:</strong> ${projectType}</p>
+        <p><strong>Budget Range:</strong> ${budget}</p>
+        <p><strong>Request ID:</strong> ${newRequest._id}</p>
+        <p>If you have any questions, please don't hesitate to contact us.</p>
+        <p>Best regards,<br>TaskNTrade Team</p>
+      `
+    };
+
+    await smtpTrans.sendMail(userMailOpts);
+
+    req.flash("success", "Your project request has been received. We'll contact you soon!");
+    res.redirect("/custom-projects");
+  } catch (error) {
+    console.error('Error processing custom project request:', error);
+    req.flash("error", "There was an error processing your request. Please try again later.");
+    res.redirect("/custom-projects");
+  }
+});
 
 module.exports = router;

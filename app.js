@@ -51,15 +51,27 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // CSRF protection
-app.use(csrf());
+const csrfProtection = csrf({ cookie: true });
+app.use(csrfProtection);
+
+// Make CSRF token available in all views
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   next();
 });
 
-// admin route
-const adminRouter = require("./routes/admin");
-app.use("/admin", adminRouter);
+// Error handling for CSRF
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    req.flash('error', 'Invalid form submission. Please try again.');
+    return res.redirect('back');
+  }
+  next(err);
+});
+
+// Admin routes
+const adminRoutes = require('./routes/admin');
+app.use('/admin', adminRoutes);
 
 // global variables across routes
 app.use(async (req, res, next) => {
