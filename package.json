@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "description": "A virtual ecommerce website using Node js, Express js, and Mongoose.",
+  "type": "module",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
@@ -10,15 +11,16 @@
   "author": "Maryam Aljanabi",
   "license": "MIT",
   "dependencies": {
-    "@adminjs/express": "^5.1.0",
+    "@adminjs/design-system": "^4.0.5",
+    "@adminjs/express": "^5.0.1",
     "@adminjs/mongoose": "^3.0.0",
-    "adminjs": "^6.8.7",
+    "adminjs": "^7.5.12",
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "^3.0.2",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.6",
-    "csurf": "^1.10.0",
+    "csurf": "^1.2.2",
     "debug": "~2.6.9",
     "dotenv": "^8.6.0",
     "ejs": "^3.1.10",

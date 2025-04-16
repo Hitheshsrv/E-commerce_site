@@ -1,26 +1,31 @@
-require("dotenv").config();
-const createError = require("http-errors");
-const express = require("express");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
-const mongoose = require("mongoose");
-const session = require("express-session");
-const passport = require("passport");
-const flash = require("connect-flash");
-const csrf = require('csurf');
-const Category = require("./models/category");
-var MongoStore = require("connect-mongo")(session);
-const connectDB = require("./config/db");
+import dotenv from "dotenv";
+dotenv.config();
+
+import createError from "http-errors";
+import express from "express";
+import path from "path";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import mongoose from "mongoose";
+import session from "express-session";
+import passport from "passport";
+import flash from "connect-flash";
+import csrf from "csurf";
+import MongoStore from "connect-mongo";
+import connectDB from "./config/db.js";
+import Category from "./models/category.js";
+
+import adminRoutes from "./routes/admin.js";
+import indexRouter from "./routes/index.js";
+import productsRouter from "./routes/products.js";
+import usersRouter from "./routes/user.js";
+import pagesRouter from "./routes/pages.js";
 
 const app = express();
-require("./config/passport");
-
-// mongodb configuration
 connectDB();
 
-// view engine setup
-app.set("views", path.join(__dirname, "views"));
+// View engine setup
+app.set("views", path.join(path.resolve(), "views"));
 app.set("view engine", "ejs");
 
 // Middleware setup
@@ -28,7 +33,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(path.resolve(), "public")));
 
 // Session configuration
 app.use(
@@ -36,13 +41,13 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({
-      mongooseConnection: mongoose.connection,
+    store: MongoStore.create({
+      mongoUrl: mongoose.connection._connectionString,
     }),
-    cookie: { 
+    cookie: {
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      secure: false
-    }
+      secure: false,
+    },
   })
 );
 
@@ -62,18 +67,17 @@ app.use((req, res, next) => {
 
 // Error handling for CSRF
 app.use((err, req, res, next) => {
-  if (err.code === 'EBADCSRFTOKEN') {
-    req.flash('error', 'Invalid form submission. Please try again.');
-    return res.redirect('back');
+  if (err.code === "EBADCSRFTOKEN") {
+    req.flash("error", "Invalid form submission. Please try again.");
+    return res.redirect("back");
   }
   next(err);
 });
 
 // Admin routes
-const adminRoutes = require('./routes/admin');
-app.use('/admin', adminRoutes);
+app.use("/admin", adminRoutes);
 
-// global variables across routes
+// Global variables across routes
 app.use(async (req, res, next) => {
   try {
     res.locals.login = req.isAuthenticated();
@@ -88,14 +92,14 @@ app.use(async (req, res, next) => {
   }
 });
 
-// add breadcrumbs
-get_breadcrumbs = function (url) {
-  var rtn = [{ name: "Home", url: "/" }],
-    acc = "", // accumulative url
-    arr = url.substring(1).split("/");
+// Add breadcrumbs
+const get_breadcrumbs = (url) => {
+  const rtn = [{ name: "Home", url: "/" }];
+  let acc = ""; // accumulative url
+  const arr = url.substring(1).split("/");
 
-  for (i = 0; i < arr.length; i++) {
-    acc = i != arr.length - 1 ? acc + "/" + arr[i] : null;
+  for (let i = 0; i < arr.length; i++) {
+    acc = i !== arr.length - 1 ? acc + "/" + arr[i] : null;
     rtn[i + 1] = {
       name: arr[i].charAt(0).toUpperCase() + arr[i].slice(1),
       url: acc,
@@ -103,41 +107,35 @@ get_breadcrumbs = function (url) {
   }
   return rtn;
 };
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   req.breadcrumbs = get_breadcrumbs(req.originalUrl);
   next();
 });
 
-//routes config
-const indexRouter = require("./routes/index");
-const productsRouter = require("./routes/products");
-const usersRouter = require("./routes/user");
-const pagesRouter = require("./routes/pages");
+// Routes configuration
 app.use("/products", productsRouter);
 app.use("/user", usersRouter);
 app.use("/pages", pagesRouter);
 app.use("/", indexRouter);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
+// Catch 404 and forward to error handler
+app.use((req, res, next) => {
   next(createError(404));
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
+// Error handler
+app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
   res.status(err.status || 500);
   res.render("error");
 });
 
 const PORT = process.env.PORT || 3000;
 app.set("port", PORT);
-app.listen(PORT, 'localhost', () => {
+app.listen(PORT, "localhost", () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-module.exports = app;
+export default app;
